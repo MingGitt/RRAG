@@ -1,0 +1,47 @@
+# 压缩包文件
+*.zip
+*.7z
+*.rar
+*.tar
+*.gz
+*.bz2
+
+# 大文件
+*.exe
+*.msi
+*.iso
+*.dmg
+*.bin
+
+# 媒体文件（可选）
+*.mp4
+*.avi
+*.mov
+*.mkv
+
+# 依赖文件夹
+node_modules/
+vendor/
+.venv/
+venv/
+
+# 环境配置
+.env
+.env.local
+
+# IDE配置
+.vscode/
+.idea/
+*.suo
+*.user
+
+# 系统文件
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# 编译产物
+dist/
+build/
+*.pyc
+__pycache__/
