@@ -1,113 +1,74 @@
 import os
-from pathlib import Path
 from typing import Optional
 
-from huggingface_hub import snapshot_download, scan_cache_dir
+
+HF_LOCAL_HUB = r"C:\Users\86151\.cache\huggingface\hub"
 
 
-def is_valid_sentence_transformer_dir(model_dir: str) -> bool:
-    """
-    粗略判断一个本地目录是不是可用的 sentence-transformers 模型目录。
-    """
-    if not model_dir:
-        return False
+def _normalize_path(path: Optional[str]) -> Optional[str]:
+    if not path:
+        return None
+    return os.path.abspath(os.path.expanduser(path))
 
-    p = Path(model_dir)
-    if not p.exists() or not p.is_dir():
-        return False
 
-    # sentence-transformers 常见关键文件，命中部分即可认为大概率可用
-    required_any = [
-        "config.json",
-        "modules.json",
-        "sentence_bert_config.json",
-        "config_sentence_transformers.json",
+def _find_snapshot_dir(repo_root: str) -> Optional[str]:
+    if not os.path.exists(repo_root):
+        return None
+
+    snapshots_dir = os.path.join(repo_root, "snapshots")
+    if not os.path.isdir(snapshots_dir):
+        return None
+
+    snapshot_names = [
+        name for name in os.listdir(snapshots_dir)
+        if os.path.isdir(os.path.join(snapshots_dir, name))
     ]
-    return any((p / name).exists() for name in required_any)
-
-
-def find_model_in_hf_cache(repo_id: str) -> Optional[str]:
-    """
-    在 Hugging Face 本地缓存里查找 repo_id，对应最新 snapshot 路径。
-    找到则返回本地路径，找不到返回 None。
-    """
-    try:
-        cache_info = scan_cache_dir()
-    except Exception:
+    if not snapshot_names:
         return None
 
-    matched = [repo for repo in cache_info.repos if repo.repo_id == repo_id]
-    if not matched:
-        return None
+    snapshot_names.sort()
+    return os.path.join(snapshots_dir, snapshot_names[-1])
 
-    repo = matched[0]
 
-    # revisions 可能为空；取最后一个可用 revision 的 snapshot_path
-    revisions = list(repo.revisions)
-    if not revisions:
-        return None
-
-    for rev in reversed(revisions):
-        snapshot_path = getattr(rev, "snapshot_path", None)
-        if snapshot_path and Path(snapshot_path).exists():
-            return str(snapshot_path)
-
-    return None
+def _repo_root_from_model_name(base_dir: str, model_name: str) -> str:
+    repo_folder = "models--" + model_name.replace("/", "--")
+    return os.path.join(base_dir, repo_folder)
 
 
 def resolve_or_download_model(
-    repo_id: str,
+    model_name: Optional[str] = None,
     local_dir: Optional[str] = None,
-    cache_dir: Optional[str] = None,
+    cache_dir: str = "./hf_cache",
+    repo_id: Optional[str] = None,
     offline: bool = False,
 ) -> str:
-    """
-    优先级：
-    1. 显式本地目录
-    2. HF 已有缓存
-    3. 在线下载到 local_dir / cache_dir
-    """
-    # 1) 显式本地目录优先
-    if local_dir and is_valid_sentence_transformer_dir(local_dir):
+    if model_name is None:
+        model_name = repo_id
+
+    if not model_name:
+        raise ValueError("resolve_or_download_model() 缺少 model_name 或 repo_id")
+
+    # 1) 显式本地目录
+    local_dir = _normalize_path(local_dir)
+    if local_dir and os.path.exists(local_dir):
         print(f"[ModelResolver] use local dir: {local_dir}")
         return local_dir
 
-    # 2) 查 HF cache
-    cached = find_model_in_hf_cache(repo_id)
-    if cached and is_valid_sentence_transformer_dir(cached):
-        print(f"[ModelResolver] use HF cache: {cached}")
-        return cached
+    # 2) 固定查 HF 默认缓存
+    hf_default_hub = _normalize_path(HF_LOCAL_HUB)
+    repo_root_default = _repo_root_from_model_name(hf_default_hub, model_name)
+    snapshot_default = _find_snapshot_dir(repo_root_default)
+    if snapshot_default:
+        print(f"[ModelResolver] use HF default cache: {snapshot_default}")
+        return snapshot_default
 
-    # 3) 离线模式则不再联网
-    if offline:
-        raise FileNotFoundError(
-            f"未找到本地模型或缓存，且当前处于离线模式：{repo_id}"
-        )
-
-    # 4) 在线下载
-    #target_dir = local_dir if local_dir else None
-    if local_dir:
-        target_dir = local_dir
-    else:
-        target_dir = os.path.join("models", repo_id.replace("/", "_"))
-
-    print(f"[ModelResolver] downloading from HF Hub: {repo_id}")
-    downloaded_path = snapshot_download(
-        repo_id=repo_id,
-        local_dir=target_dir,
-        cache_dir=None,
-        local_dir_use_symlinks=False,
-        resume_download=True,
+    # 3) 不再使用 project cache，也不联网
+    raise RuntimeError(
+        "\n"
+        f"[ModelResolver] 未找到可用本地模型: {model_name}\n"
+        f"已检查位置：\n"
+        f"1. local_dir = {local_dir}\n"
+        f"2. HF 默认缓存 = {hf_default_hub}\n\n"
+        f"当前已禁用 project cache 和联网下载。\n"
+        f"请确认模型存在于上述路径之一。\n"
     )
-
-    # snapshot_download 返回下载后的目录
-    if is_valid_sentence_transformer_dir(downloaded_path):
-        print(f"[ModelResolver] download complete: {downloaded_path}")
-        return downloaded_path
-
-    # 有些情况下 local_dir 才是实际可直接加载目录
-    if target_dir and is_valid_sentence_transformer_dir(target_dir):
-        print(f"[ModelResolver] download complete: {target_dir}")
-        return target_dir
-
-    raise FileNotFoundError(f"模型下载后仍未找到有效目录：{repo_id}")

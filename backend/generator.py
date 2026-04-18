@@ -3,7 +3,7 @@ import re
 
 import aiohttp
 
-from config import HEADERS, MAX_CONCURRENCY, QWEN_MODEL, QWEN_URL
+from config import QW_HEADERS, MAX_CONCURRENCY, QWEN_MODEL, QWEN_URL
 
 
 class Generator:
@@ -26,26 +26,6 @@ class Generator:
 
     @staticmethod
     def build_citations(chunks, max_citations=3, excerpt_len=220):
-        """
-        chunks: List[{
-            "doc_id": ...,
-            "text": ...,
-            "score": ...,
-            "meta": {...}
-        }]
-
-        return:
-        [
-          {
-            "index": 1,
-            "source": "xxx.pdf | page 3",
-            "excerpt": "...",
-            "doc_id": "...",
-            "page_no": 3,
-            "text": "完整证据文本"
-          }
-        ]
-        """
         citations = []
         for i, item in enumerate(chunks[:max_citations], start=1):
             meta = item.get("meta", {})
@@ -65,9 +45,6 @@ class Generator:
 
     @staticmethod
     def build_context_from_citations(citations):
-        """
-        用带编号的证据构建上下文
-        """
         blocks = []
         for item in citations:
             idx = item["index"]
@@ -125,27 +102,39 @@ class Generator:
 """
 
     @staticmethod
+    def _extract_answer(data):
+        try:
+            return data["output"]["text"].strip()
+        except Exception:
+            pass
+
+        try:
+            return data["choices"][0]["message"]["content"].strip()
+        except Exception:
+            return ""
+
+    @staticmethod
     async def call_llm(session, prompt):
         payload = {
             "model": QWEN_MODEL,
-            "messages": [
-                {"role": "user", "content": prompt}
-            ],
-            "temperature": 0.2,
+            "input": {
+                "messages": [
+                    {"role": "user", "content": prompt}
+                ]
+            },
+            "parameters": {
+                "temperature": 0.2,
+                "max_tokens": 1024,
+            }
         }
 
-        async with session.post(QWEN_URL, headers=HEADERS, json=payload) as resp:
+        async with session.post(QWEN_URL, headers=QW_HEADERS, json=payload) as resp:
             resp.raise_for_status()
             data = await resp.json()
-            return data["choices"][0]["message"]["content"]
+            return Generator._extract_answer(data)
 
     @staticmethod
     def postprocess_answer(answer: str, available_indices):
-        """
-        清理一下模型可能产生的异常编号：
-        - 保留 [1] [2] 这种格式
-        - 删除不在 available_indices 中的编号
-        """
         if not answer:
             return answer
 

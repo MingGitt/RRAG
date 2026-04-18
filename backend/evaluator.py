@@ -1,13 +1,7 @@
 from collections import defaultdict
-from beir.retrieval.evaluation import EvaluateRetrieval
+
 
 class RetrievalEvaluator:
-
-    @staticmethod
-    def evaluate(qrels, results):
-        evaluator = EvaluateRetrieval()
-        return evaluator.evaluate(qrels, results, k_values=[1, 3, 5,10])
-    
     @staticmethod
     def aggregate_doc_scores(ranked_chunks, mode="top2_mean"):
         """
@@ -33,4 +27,4 @@ class RetrievalEvaluator:
             else:
                 doc_scores[doc_id] = scores[0]
 
-        return doc_scores        
+        return doc_scores

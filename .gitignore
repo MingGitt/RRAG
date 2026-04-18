@@ -44,4 +44,8 @@ desktop.ini
 dist/
 build/
 *.pyc
-__pycache__/
+__pycache__/modules/
+.history/
+backend/hf_cache/
+*.safetensors
+*.bin

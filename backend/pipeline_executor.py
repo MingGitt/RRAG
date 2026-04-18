@@ -5,10 +5,19 @@ from config import (
     DENSE_CANDIDATE_K,
     DOC_AGG_MODE,
     TOP_K_CHUNKS,
+    ENABLE_SELF_RAG_CRITIQUE,
+    SELF_RAG_CRITIQUE_TOP_K,
+    SELF_RAG_GENERATION_TOP_N,
+    SELF_RAG_MAX_PER_DOC,
+    SELF_RAG_MIN_SCORE,
+    SELF_RAG_W_REL,
+    SELF_RAG_W_SUP,
+    SELF_RAG_W_USE,
 )
 from evaluator import RetrievalEvaluator
 from query_optimizer import QueryOptimizer
 from reranker import Reranker
+from self_rag import EvidenceCritiqueScorer, EvidenceSelector
 
 
 def merge_retrieved_chunks(all_chunks, top_k=50):
@@ -131,6 +140,7 @@ def process_single_query(
             "meta": meta,
         })
 
+    # ========= 文档级评估仍然保留原逻辑 =========
     doc_level_for_eval = [
         (item["doc_id"], item["text"], item["score"])
         for item in ranked_chunks
@@ -150,21 +160,48 @@ def process_single_query(
             "ranked_chunks": ranked_chunks,
         }
 
-    gen_chunks_input = [
-        {
-            "doc_id": item["doc_id"],
-            "text": item["text"],
-            "score": item["score"],
-            "meta": item["meta"],
-        }
-        for item in ranked_chunks
-    ]
+    # ========= Self-RAG: rerank 后 evidence critique =========
+    if ENABLE_SELF_RAG_CRITIQUE:
+        critique_input = ranked_chunks[:SELF_RAG_CRITIQUE_TOP_K]
 
-    gen_chunks = Reranker.select_generation_chunks(
-        gen_chunks_input,
-        top_n=5,
-        max_per_doc=3
-    )
+        scorer = EvidenceCritiqueScorer(
+            w_rel=SELF_RAG_W_REL,
+            w_sup=SELF_RAG_W_SUP,
+            w_use=SELF_RAG_W_USE,
+        )
+        selector = EvidenceSelector(min_score=SELF_RAG_MIN_SCORE)
+
+        scored_chunks = scorer.score_chunks(query, critique_input)
+
+        gen_chunks = selector.select_generation_chunks(
+            scored_chunks,
+            top_n=SELF_RAG_GENERATION_TOP_N,
+            max_per_doc=SELF_RAG_MAX_PER_DOC
+        )
+
+        # 如果一个都没留下，则回退到原 rerank 结果
+        if not gen_chunks:
+            gen_chunks = selector.fallback_select(
+                ranked_chunks,
+                top_n=SELF_RAG_GENERATION_TOP_N,
+                max_per_doc=SELF_RAG_MAX_PER_DOC
+            )
+    else:
+        gen_chunks_input = [
+            {
+                "doc_id": item["doc_id"],
+                "text": item["text"],
+                "score": item["score"],
+                "meta": item["meta"],
+            }
+            for item in ranked_chunks
+        ]
+
+        gen_chunks = Reranker.select_generation_chunks(
+            gen_chunks_input,
+            top_n=5,
+            max_per_doc=3
+        )
 
     return {
         "qid": qid,

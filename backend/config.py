@@ -1,29 +1,28 @@
 import os
 
-# ========= API =========
-QWEN_API_KEY = os.environ.get("QWEN_API_KEY")
-assert QWEN_API_KEY, "请先设置 QWEN_API_KEY"
+# ========= Qwen API =========
+DASHSCOPE_API_KEY = os.environ.get("DASHSCOPE_API_KEY")
+assert DASHSCOPE_API_KEY, "请先设置 DASHSCOPE_API_KEY"
 
-QWEN_URL = "https://api.edgefn.net/v1/chat/completions"
-QWEN_MODEL = "Qwen3-Next-80B-A3B-Instruct"
+QWEN_URL = os.environ.get(
+    "QWEN_URL",
+    "https://dashscope.aliyuncs.com/api/v1/services/aigc/text-generation/generation"
+)
+QWEN_MODEL = os.environ.get("QWEN_MODEL", "qwen-plus")
 
-HEADERS = {
-    "Authorization": f"Bearer {QWEN_API_KEY}",
+QW_HEADERS = {
+    "Authorization": f"Bearer {DASHSCOPE_API_KEY}",
     "Content-Type": "application/json"
 }
-
-# ========= 数据源模式 =========
-# 可选: "beir" / "local_docs"
-DATA_SOURCE = os.environ.get("DATA_SOURCE", "local_docs")
-
-# ========= BEIR 数据 =========
-DATASET = os.environ.get("DATASET", "scifact")
-DATASET_PATH = os.environ.get("DATASET_PATH", "../beir_datasets/scifact")
-TARGET_QID = os.environ.get("TARGET_QID", "35")
 
 # ========= 本地文档模式 =========
 LOCAL_DOCS_DIR = os.environ.get("LOCAL_DOCS_DIR", "../docs")
 LOCAL_QUERY_ID = os.environ.get("LOCAL_QUERY_ID", "local_query_1")
+
+# ========= BEIR 评测（仅供独立测试脚本使用） =========
+DATASET = os.environ.get("DATASET", "scifact")
+DATASET_PATH = os.environ.get("DATASET_PATH", "../beir_datasets/scifact")
+TARGET_QID = os.environ.get("TARGET_QID", "35")
 
 # ========= 模型 =========
 EMBED_MODEL_NAME = os.environ.get("EMBED_MODEL_NAME", "BAAI/bge-base-en-v1.5")
@@ -40,7 +39,6 @@ RERANK_TOP_DOCS = int(os.environ.get("RERANK_TOP_DOCS", 10))
 ALPHA = float(os.environ.get("ALPHA", 0.7))
 DENSE_CANDIDATE_K = int(os.environ.get("DENSE_CANDIDATE_K", 200))
 BM25_CANDIDATE_K = int(os.environ.get("BM25_CANDIDATE_K", 100))
-
 DOC_AGG_MODE = os.environ.get("DOC_AGG_MODE", "max")
 
 # ========= 向量库 =========
@@ -59,3 +57,13 @@ MAX_CONCURRENCY = int(os.environ.get("MAX_CONCURRENCY", 4))
 
 # ========= 展示 =========
 SHOW_TOP_K = int(os.environ.get("SHOW_TOP_K", 5))
+
+# ========= Self-RAG: evidence critique =========
+ENABLE_SELF_RAG_CRITIQUE = os.environ.get("ENABLE_SELF_RAG_CRITIQUE", "true").lower() == "true"
+SELF_RAG_CRITIQUE_TOP_K = int(os.environ.get("SELF_RAG_CRITIQUE_TOP_K", 3))
+SELF_RAG_GENERATION_TOP_N = int(os.environ.get("SELF_RAG_GENERATION_TOP_N", 3))
+SELF_RAG_MAX_PER_DOC = int(os.environ.get("SELF_RAG_MAX_PER_DOC", 3))
+SELF_RAG_MIN_SCORE = float(os.environ.get("SELF_RAG_MIN_SCORE", 0.55))
+SELF_RAG_W_REL = float(os.environ.get("SELF_RAG_W_REL", 0.4))
+SELF_RAG_W_SUP = float(os.environ.get("SELF_RAG_W_SUP", 0.4))
+SELF_RAG_W_USE = float(os.environ.get("SELF_RAG_W_USE", 0.2))
