@@ -1,12 +1,23 @@
+# generator.py
 import asyncio
 import re
+from typing import Dict, List
 
-import aiohttp
-
-from config import QW_HEADERS, MAX_CONCURRENCY, QWEN_MODEL, QWEN_URL
+from config import MAX_CONCURRENCY
+from candidate_generator import CandidateGenerator
+from evidence_scorer import EvidenceScorer
+from risk_controller import RiskController
+from selfrag_llm import SelfRagLLM
 
 
 class Generator:
+    """
+    模块化生成调度器：
+    - CandidateGenerator：多候选生成
+    - EvidenceScorer：证据一致性打分
+    - RiskController：生成风险评估
+    """
+
     @staticmethod
     def _format_source(meta, doc_id):
         title = meta.get("title", "") if meta else ""
@@ -25,7 +36,7 @@ class Generator:
         return text[:max_len].rstrip() + "..."
 
     @staticmethod
-    def build_citations(chunks, max_citations=3, excerpt_len=220):
+    def build_citations(chunks, max_citations=5, excerpt_len=220):
         citations = []
         for i, item in enumerate(chunks[:max_citations], start=1):
             meta = item.get("meta", {})
@@ -54,118 +65,67 @@ class Generator:
         return "\n\n".join(blocks)
 
     @staticmethod
-    def build_prompt(query, citations):
-        context = Generator.build_context_from_citations(citations)
-        return f"""你是一个文档问答助手。请严格依据给定证据回答问题，不要编造。
+    async def run_single(qid, query, chunks):
+        llm = SelfRagLLM()
+        candidate_generator = CandidateGenerator(llm)
+        evidence_scorer = EvidenceScorer()
+        risk_controller = RiskController()
 
-问题：
-{query}
+        citations = Generator.build_citations(chunks, max_citations=5, excerpt_len=220)
+        evidence_text = Generator.build_context_from_citations(citations)
 
-证据：
-{context}
+        raw_candidates = await asyncio.to_thread(
+            candidate_generator.generate_candidates,
+            query,
+            evidence_text,
+            "",
+            3,
+        )
 
-回答要求：
-1. 只能根据给定证据回答；
-2. 如果证据不足，请明确写“证据不足”；
-3. 回答尽量准确、简洁、有条理；
-4. 每一个关键结论后面都要标注证据编号，例如 [1] 或 [2]；
-5. 如果一句话同时由多个证据支持，可以写成 [1][2]；
-6. 不要使用未提供的编号；
-7. 不要在回答末尾单独列“参考文献”，只在正文句子后标注编号；
-8. 不要编造证据中不存在的事实。
+        scored_candidates = evidence_scorer.score_candidates(raw_candidates, chunks, query)
 
-请直接输出最终答案正文。
-"""
-
-    @staticmethod
-    def build_judge_prompt(query, answer, citations):
-        context = Generator.build_context_from_citations(citations)
-        return f"""请你作为评审，判断下面回答是否忠实于证据，是否回答了问题。
-
-问题：
-{query}
-
-证据：
-{context}
-
-回答：
-{answer}
-
-请输出 JSON，格式如下：
-{{
-  "faithfulness": 0-10,
-  "relevance": 0-10,
-  "citation_correctness": 0-10,
-  "overall": 0-10,
-  "comment": "简短评价"
-}}
-"""
-
-    @staticmethod
-    def _extract_answer(data):
-        try:
-            return data["output"]["text"].strip()
-        except Exception:
-            pass
-
-        try:
-            return data["choices"][0]["message"]["content"].strip()
-        except Exception:
-            return ""
-
-    @staticmethod
-    async def call_llm(session, prompt):
-        payload = {
-            "model": QWEN_MODEL,
-            "input": {
-                "messages": [
-                    {"role": "user", "content": prompt}
-                ]
-            },
-            "parameters": {
-                "temperature": 0.2,
-                "max_tokens": 1024,
-            }
+        best_candidate = scored_candidates[0] if scored_candidates else {
+            "answer": "根据当前检索到的文档，暂时无法确定答案。",
+            "raw_text": "",
+            "retrieve": "Unknown",
+            "isrel": "Unknown",
+            "issup": "Unknown",
+            "isuse": 1,
+            "followup_query": "None",
+            "evidence_score": 0.0,
+            "final_score": 0.0,
+            "used_chunk_ids": [],
         }
 
-        async with session.post(QWEN_URL, headers=QW_HEADERS, json=payload) as resp:
-            resp.raise_for_status()
-            data = await resp.json()
-            return Generator._extract_answer(data)
+        generation_risk = risk_controller.assess_generation_risk(
+            scored_candidates,
+            best_candidate,
+        )
 
-    @staticmethod
-    def postprocess_answer(answer: str, available_indices):
-        if not answer:
-            return answer
+        answer = best_candidate.get("answer", "") or "根据当前检索到的文档，暂时无法确定答案。"
 
-        valid_set = set(int(x) for x in available_indices)
-
-        def replace_ref(match):
-            num = int(match.group(1))
-            return f"[{num}]" if num in valid_set else ""
-
-        answer = re.sub(r"\[(\d+)\]", replace_ref, answer)
-        answer = re.sub(r"\s+", " ", answer).strip()
-        return answer
-
-    @staticmethod
-    async def run_single(session, qid, query, chunks):
-        citations = Generator.build_citations(chunks, max_citations=3, excerpt_len=220)
-
-        answer_prompt = Generator.build_prompt(query, citations)
-        answer = await Generator.call_llm(session, answer_prompt)
-        answer = Generator.postprocess_answer(answer, [c["index"] for c in citations])
-
-        judge_prompt = Generator.build_judge_prompt(query, answer, citations)
-        judge = await Generator.call_llm(session, judge_prompt)
+        if generation_risk["risk_level"] == "high":
+            answer = (
+                "根据当前检索到的文档，现有证据不足以支持非常确定的结论。"
+                "下面给出基于已有证据的谨慎回答：\n" + answer
+            )
 
         return qid, {
             "answer": answer,
-            "judge": judge,
+            "raw_text": best_candidate.get("raw_text", ""),
+            "reflections": {
+                "retrieve": best_candidate.get("retrieve", "Unknown"),
+                "isrel": best_candidate.get("isrel", "Unknown"),
+                "issup": best_candidate.get("issup", "Unknown"),
+                "isuse": best_candidate.get("isuse", 1),
+                "followup_query": best_candidate.get("followup_query", "None"),
+            },
             "chunks": chunks,
             "citations": citations,
+            "candidates": scored_candidates,
+            "generation_risk": generation_risk,
         }
-
+    
     @staticmethod
     async def run(queries, generation_chunks, max_samples=1, max_concurrency=None):
         if max_concurrency is None:
@@ -174,27 +134,44 @@ class Generator:
         results = {}
         semaphore = asyncio.Semaphore(max_concurrency)
 
-        async def limited_run(session, qid, query, chunks):
+        async def limited_run(qid, query, chunks):
             async with semaphore:
-                return await Generator.run_single(session, qid, query, chunks)
+                return await Generator.run_single(qid, query, chunks)
 
         selected_items = list(queries.items())[:max_samples]
 
-        timeout = aiohttp.ClientTimeout(total=300)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
-            tasks = []
-            for qid, query in selected_items:
-                chunks = generation_chunks.get(qid, [])
-                if not chunks:
-                    continue
-                tasks.append(limited_run(session, qid, query, chunks))
-
-            outputs = await asyncio.gather(*tasks, return_exceptions=True)
-
-        for output in outputs:
-            if isinstance(output, Exception):
+        tasks = []
+        task_qids = []
+        for qid, query in selected_items:
+            chunks = generation_chunks.get(qid, [])
+            if not chunks:
+                print(f"[GENERATOR][SKIP] qid={qid} has no generation_chunks")
                 continue
-            qid, result = output
-            results[qid] = result
+            tasks.append(limited_run(qid, query, chunks))
+            task_qids.append(qid)
+
+        outputs = await asyncio.gather(*tasks, return_exceptions=True)
+
+        for qid, output in zip(task_qids, outputs):
+            if isinstance(output, Exception):
+                print(f"[GENERATOR][ERROR] qid={qid}: {repr(output)}")
+                results[qid] = {
+                    "answer": "生成失败。",
+                    "raw_text": "",
+                    "reflections": {},
+                    "chunks": generation_chunks.get(qid, []),
+                    "citations": [],
+                    "candidates": [],
+                    "generation_risk": {
+                        "risk_score": 1.0,
+                        "risk_level": "high",
+                        "confidence": 0.0,
+                        "reasons": [f"生成阶段异常: {repr(output)}"],
+                    },
+                }
+                continue
+
+            out_qid, result = output
+            results[out_qid] = result
 
         return results

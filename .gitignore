@@ -49,3 +49,21 @@ __pycache__/modules/
 backend/hf_cache/
 *.safetensors
 *.bin
+# 模型文件
+backend/models/
+backend/hf_cache/
+*.safetensors
+*.bin
+
+# 向量数据库
+chroma_store/
+*.pickle
+*.parquet
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# 历史备份
+.history/

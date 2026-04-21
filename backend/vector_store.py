@@ -47,20 +47,72 @@ class VectorStoreBuilder:
         return final_chunks
 
     @staticmethod
+    def _is_valid_embedding_model_dir(model_dir: str) -> bool:
+        """
+        粗略判断一个目录是否足够像可加载的 HF / sentence-transformers 模型目录。
+        这里只做工程上的兜底校验，避免把不完整 snapshot 直接喂给 embeddings。
+        """
+        if not model_dir or not os.path.isdir(model_dir):
+            return False
+
+        existing = set(os.listdir(model_dir))
+
+        # 常见 transformer / sentence-transformers 关键文件
+        indicators = {
+            "config.json",
+            "tokenizer.json",
+            "tokenizer_config.json",
+            "vocab.txt",
+            "sentence_bert_config.json",
+            "modules.json",
+            "special_tokens_map.json",
+        }
+
+        # 至少要有一些关键文件，且最好要有配置文件
+        has_indicator = any(name in existing for name in indicators)
+        has_config = "config.json" in existing or "modules.json" in existing
+
+        return has_indicator and has_config
+
+    @staticmethod
     def _build_embeddings():
         os.environ["HF_HOME"] = HF_CACHE_DIR
         os.environ["HF_HUB_CACHE"] = HF_CACHE_DIR
         os.environ["HF_HUB_ETAG_TIMEOUT"] = HF_HUB_ETAG_TIMEOUT
         os.environ["HF_HUB_DOWNLOAD_TIMEOUT"] = HF_HUB_DOWNLOAD_TIMEOUT
 
-        model_path = resolve_or_download_model(
-            repo_id=EMBED_MODEL_NAME,
-            local_dir=EMBED_MODEL_LOCAL_DIR,
-            cache_dir=HF_CACHE_DIR,
-            offline=False,
-        )
+        model_path = None
 
-        print(f"[Embedding] loading model from: {model_path}")
+        # 1. 优先尝试用户显式指定的本地目录
+        if EMBED_MODEL_LOCAL_DIR:
+            if VectorStoreBuilder._is_valid_embedding_model_dir(EMBED_MODEL_LOCAL_DIR):
+                model_path = EMBED_MODEL_LOCAL_DIR
+                print(f"[Embedding] using explicit local dir: {model_path}")
+            else:
+                print(f"[Embedding][WARN] EMBED_MODEL_LOCAL_DIR is invalid or incomplete: {EMBED_MODEL_LOCAL_DIR}")
+
+        # 2. 如果没有可用的显式本地目录，则尝试缓存解析 / 自动补下载
+        if not model_path:
+            try:
+                candidate = resolve_or_download_model(
+                    model_name=EMBED_MODEL_NAME,
+                    local_dir=EMBED_MODEL_LOCAL_DIR,
+                    cache_dir=HF_CACHE_DIR,
+                    offline=False,
+                )
+
+                if VectorStoreBuilder._is_valid_embedding_model_dir(candidate):
+                    model_path = candidate
+                    print(f"[Embedding] loading model from: {model_path}")
+                else:
+                    print(f"[Embedding][WARN] resolved path is incomplete: {candidate}")
+            except Exception as e:
+                print(f"[Embedding][WARN] resolve_or_download_model failed: {e}")
+
+        # 3. 最后兜底：直接交给 HuggingFaceEmbeddings 用 repo id 自己处理
+        if not model_path:
+            model_path = EMBED_MODEL_NAME
+            print(f"[Embedding] fallback to repo id: {model_path}")
 
         embeddings = HuggingFaceEmbeddings(
             model_name=model_path,

@@ -38,7 +38,7 @@ def answer_one_query(
 ):
     """
     对单个 query 执行完整问答流程：
-    检索 -> 重排 -> 生成 -> 返回结构化结果
+    原检索链路 -> Self-RAG 生成
     """
     queries = {query_id: query_text}
 
@@ -70,9 +70,6 @@ def answer_one_query(
 
 
 def print_single_answer_result(query_id, query_text, result):
-    """
-    把单次问答结果打印到终端
-    """
     ranked_chunks = result["ranked_chunks_map"].get(query_id, [])
     gen_output = result["gen_outputs"].get(query_id)
 
@@ -108,14 +105,14 @@ def print_single_answer_result(query_id, query_text, result):
     citations = gen_output.get("citations", [])
     print_citations(citations)
 
-    print("\n========== Judge ==========")
-    print(gen_output["judge"])
+    print("\n========== Self-RAG Reflections ==========")
+    print(gen_output.get("reflections", {}))
+
+    print("\n========== Raw Self-RAG Output ==========")
+    print(gen_output.get("raw_text", ""))
 
 
 def interactive_local_qa(retriever, reranker, reranker_lock):
-    """
-    本地文档模式：终端交互式问答
-    """
     print("\n===== 本地文档问答模式 =====")
     print("输入你的问题后回车即可提问；输入 exit / quit / q 退出。")
 
