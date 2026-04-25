@@ -8,73 +8,284 @@ import {
   MessageSquare,
   Send,
   Loader2,
+  Trash2,
+  ShieldAlert,
+  Bot,
+  Search,
+  TriangleAlert,
+  FileUp,
+  CircleHelp,
 } from "lucide-react";
 
-export default function LocalDocRagFrontend() {
-  const API_BASE = "http://127.0.0.1:8000";
+const API_BASE =
+  import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") ||
+  "http://127.0.0.1:8000";
 
+const acceptedTypes = ".pdf,.docx,.txt";
+
+const statusConfig = {
+  uploaded: {
+    label: "已上传",
+    className: "status uploaded",
+    icon: FileUp,
+    retryable: false,
+  },
+  indexing: {
+    label: "索引中",
+    className: "status indexing",
+    icon: Loader2,
+    retryable: false,
+  },
+  indexed: {
+    label: "已索引",
+    className: "status indexed",
+    icon: CheckCircle2,
+    retryable: false,
+  },
+  upload_failed: {
+    label: "上传失败",
+    className: "status failed",
+    icon: AlertCircle,
+    retryable: false,
+  },
+  index_failed: {
+    label: "索引失败",
+    className: "status failed",
+    icon: AlertCircle,
+    retryable: true,
+  },
+};
+
+function safeJsonParse(text, fallback) {
+  try {
+    return JSON.parse(text);
+  } catch {
+    return fallback;
+  }
+}
+
+function makeSessionId() {
+  const key = "rrag_session_id";
+  const old = localStorage.getItem(key);
+  if (old) return old;
+  const created = `session-${Date.now()}`;
+  localStorage.setItem(key, created);
+  return created;
+}
+
+function RiskBadge({ risk }) {
+  if (!risk) return null;
+
+  const level = risk.risk_level || "unknown";
+  const map = {
+    low: "risk-badge low",
+    medium: "risk-badge medium",
+    high: "risk-badge high",
+    unknown: "risk-badge unknown",
+  };
+
+  return (
+    <div className={map[level] || map.unknown}>
+      <ShieldAlert size={14} />
+      <span>
+        风险：{level}（{Number(risk.risk_score ?? 0).toFixed(2)}）
+      </span>
+    </div>
+  );
+}
+
+function ReflectionPanel({ reflections }) {
+  if (!reflections?.length) return null;
+
+  return (
+    <div className="meta-panel">
+      <div className="meta-title">Self-RAG 反思信息</div>
+      {reflections.map((item, idx) => (
+        <div className="reflection-card" key={`${idx}-${item.round}`}>
+          <div className="reflection-grid">
+            <div><strong>轮次：</strong>{item.round}</div>
+            <div><strong>Retrieve：</strong>{item.retrieve}</div>
+            <div><strong>相关性：</strong>{item.isrel}</div>
+            <div><strong>支持度：</strong>{item.issup}</div>
+            <div><strong>有用性：</strong>{item.isuse}</div>
+            <div><strong>FollowUp：</strong>{item.followup_query || "None"}</div>
+          </div>
+          {item.raw_text ? (
+            <details className="raw-box">
+              <summary>查看原始模型输出</summary>
+              <pre>{item.raw_text}</pre>
+            </details>
+          ) : null}
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function TracePanel({ trace }) {
+  if (!trace?.length) return null;
+
+  return (
+    <div className="meta-panel">
+      <div className="meta-title">执行轨迹</div>
+      <div className="trace-list">
+        {trace.map((item, idx) => (
+          <div className="trace-item" key={`${item.stage}-${idx}`}>
+            <div className="trace-head">
+              <span className="trace-stage">{item.stage}</span>
+              {item.round ? <span className="trace-round">Round {item.round}</span> : null}
+            </div>
+            {item.query ? <div className="trace-line"><strong>Query：</strong>{item.query}</div> : null}
+            {item.retrieve ? <div className="trace-line"><strong>Retrieve：</strong>{item.retrieve}</div> : null}
+            {typeof item.retrieved_count === "number" ? (
+              <div className="trace-line"><strong>Retrieved：</strong>{item.retrieved_count}</div>
+            ) : null}
+            {item.detail ? <div className="trace-line"><strong>Detail：</strong>{item.detail}</div> : null}
+            {item.top_sources?.length ? (
+              <div className="trace-line">
+                <strong>Top Sources：</strong>
+                <ul className="trace-sources">
+                  {item.top_sources.map((src, i) => (
+                    <li key={`${src}-${i}`}>{src}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CandidatesPanel({ candidates }) {
+  if (!candidates?.length) return null;
+
+  return (
+    <div className="meta-panel">
+      <div className="meta-title">候选答案</div>
+      <div className="candidate-list">
+        {candidates.map((item, idx) => (
+          <div className="candidate-card" key={idx}>
+            <div className="candidate-score-row">
+              <span>候选 {idx + 1}</span>
+              <span>final_score = {Number(item.final_score ?? 0).toFixed(4)}</span>
+            </div>
+            <div className="candidate-score-sub">
+              evidence_score = {Number(item.evidence_score ?? 0).toFixed(4)}，
+              retrieve = {item.retrieve}，
+              isrel = {item.isrel}，
+              issup = {item.issup}，
+              isuse = {item.isuse}
+            </div>
+            <div className="candidate-answer">{item.answer || "无内容"}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CitationsPanel({ citations }) {
+  if (!citations?.length) return null;
+
+  return (
+    <div className="meta-panel">
+      <div className="meta-title">参考来源</div>
+      <div className="citation-list">
+        {citations.map((c) => (
+          <div className="citation-card" key={`${c.index}-${c.source}`}>
+            <div className="citation-source">
+              [{c.index}] {c.source}
+            </div>
+            <div className="citation-excerpt">{c.excerpt}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function AssistantMessage({ msg }) {
+  return (
+    <div className="message assistant">
+      <div className="avatar"><Bot size={18} /></div>
+      <div className="bubble-wrap">
+        <div className="bubble">{msg.content || "未返回答案。"}</div>
+        <CitationsPanel citations={msg.citations} />
+        <ReflectionPanel reflections={msg.reflections} />
+        <TracePanel trace={msg.trace} />
+        <CandidatesPanel candidates={msg.candidates} />
+        <div className="risk-row">
+          <RiskBadge risk={msg.retrieval_risk} />
+          <RiskBadge risk={msg.generation_risk} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function UserMessage({ msg }) {
+  return (
+    <div className="message user">
+      <div className="bubble-wrap">
+        <div className="bubble">{msg.content}</div>
+      </div>
+      <div className="avatar user"><MessageSquare size={18} /></div>
+    </div>
+  );
+}
+
+export default function LocalDocRagFrontend() {
   const [files, setFiles] = useState([]);
-  const [messages, setMessages] = useState([
-    {
-      id: "welcome",
-      role: "assistant",
-      content: "你好，请先上传 PDF、DOCX 或 TXT 文档。文件上传并完成索引后，你就可以开始提问。",
-      citations: [],
-    },
-  ]);
   const [query, setQuery] = useState("");
   const [dragging, setDragging] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const fileInputRef = useRef(null);
+  const [loadingFiles, setLoadingFiles] = useState(false);
+  const [globalError, setGlobalError] = useState("");
+  const [sessionId] = useState(() => makeSessionId());
 
-  const statusConfig = {
-    uploaded: {
-      label: "已上传",
-      className: "bg-blue-50 text-blue-700 border-blue-200",
-      icon: <CheckCircle2 className="w-4 h-4" />,
-      retryable: false,
+  const fileInputRef = useRef(null);
+  const chatRef = useRef(null);
+
+  const [messages, setMessages] = useState([
+    {
+      id: "welcome",
+      role: "assistant",
+      content:
+        "你好，请先上传 PDF、DOCX 或 TXT 文档。文件完成索引后，就可以基于当前文档进行问答。",
+      citations: [],
+      reflections: [],
+      trace: [],
+      candidates: [],
+      retrieval_risk: null,
+      generation_risk: null,
     },
-    indexing: {
-      label: "索引中",
-      className: "bg-amber-50 text-amber-700 border-amber-200",
-      icon: <Loader2 className="w-4 h-4 animate-spin" />,
-      retryable: false,
-    },
-    indexed: {
-      label: "已索引",
-      className: "bg-emerald-50 text-emerald-700 border-emerald-200",
-      icon: <CheckCircle2 className="w-4 h-4" />,
-      retryable: false,
-    },
-    upload_failed: {
-      label: "上传失败",
-      className: "bg-red-50 text-red-700 border-red-200",
-      icon: <AlertCircle className="w-4 h-4" />,
-      retryable: false,
-    },
-    index_failed: {
-      label: "索引失败",
-      className: "bg-red-50 text-red-700 border-red-200",
-      icon: <RefreshCw className="w-4 h-4" />,
-      retryable: true,
-    },
-  };
+  ]);
 
   const indexedCount = useMemo(
     () => files.filter((f) => f.status === "indexed").length,
     [files]
   );
 
-  const acceptedTypes = ".pdf,.docx,.txt";
+  const hasIndexing = useMemo(
+    () => files.some((f) => f.status === "indexing"),
+    [files]
+  );
 
   const fetchFiles = async () => {
     try {
+      setLoadingFiles(true);
       const res = await fetch(`${API_BASE}/files`);
       const data = await res.json();
       setFiles(data.files || []);
+      setGlobalError("");
     } catch (e) {
       console.error("获取文件列表失败", e);
+      setGlobalError("无法连接后端或获取文件列表失败。");
+    } finally {
+      setLoadingFiles(false);
     }
   };
 
@@ -82,23 +293,45 @@ export default function LocalDocRagFrontend() {
     fetchFiles();
   }, []);
 
+  useEffect(() => {
+    if (!hasIndexing) return;
+    const timer = setInterval(() => {
+      fetchFiles();
+    }, 2500);
+    return () => clearInterval(timer);
+  }, [hasIndexing]);
+
+  useEffect(() => {
+    if (!chatRef.current) return;
+    chatRef.current.scrollTop = chatRef.current.scrollHeight;
+  }, [messages, submitting]);
+
   const uploadFiles = async (incomingFiles) => {
-    const list = Array.from(incomingFiles);
-    if (list.length === 0) return;
+    const list = Array.from(incomingFiles || []);
+    if (!list.length) return;
 
     const formData = new FormData();
     list.forEach((file) => formData.append("files", file));
 
     setUploading(true);
+    setGlobalError("");
+
     try {
       const res = await fetch(`${API_BASE}/upload`, {
         method: "POST",
         body: formData,
       });
-      const data = await res.json();
+
+      const text = await res.text();
+      const data = safeJsonParse(text, {});
+      if (!res.ok) {
+        throw new Error(data.detail || "上传失败");
+      }
+
       setFiles(data.files || []);
     } catch (e) {
       console.error("上传失败", e);
+      setGlobalError(e.message || "上传失败");
     } finally {
       setUploading(false);
     }
@@ -106,9 +339,7 @@ export default function LocalDocRagFrontend() {
 
   const onFilesSelected = (event) => {
     const selected = event.target.files;
-    if (selected && selected.length > 0) {
-      uploadFiles(selected);
-    }
+    if (selected?.length) uploadFiles(selected);
     event.target.value = "";
   };
 
@@ -116,9 +347,7 @@ export default function LocalDocRagFrontend() {
     event.preventDefault();
     setDragging(false);
     const dropped = event.dataTransfer.files;
-    if (dropped && dropped.length > 0) {
-      uploadFiles(dropped);
-    }
+    if (dropped?.length) uploadFiles(dropped);
   };
 
   const retryIndex = async (filename) => {
@@ -127,10 +356,29 @@ export default function LocalDocRagFrontend() {
         `${API_BASE}/files/${encodeURIComponent(filename)}/retry-index`,
         { method: "POST" }
       );
-      await res.json();
+      const text = await res.text();
+      const data = safeJsonParse(text, {});
+      if (!res.ok) throw new Error(data.detail || "重试索引失败");
       fetchFiles();
     } catch (e) {
       console.error("重试索引失败", e);
+      setGlobalError(e.message || "重试索引失败");
+    }
+  };
+
+  const removeFile = async (filename) => {
+    try {
+      const res = await fetch(
+        `${API_BASE}/files/${encodeURIComponent(filename)}`,
+        { method: "DELETE" }
+      );
+      const text = await res.text();
+      const data = safeJsonParse(text, {});
+      if (!res.ok) throw new Error(data.detail || "删除文件失败");
+      setFiles(data.files || []);
+    } catch (e) {
+      console.error("删除文件失败", e);
+      setGlobalError(e.message || "删除文件失败");
     }
   };
 
@@ -142,12 +390,12 @@ export default function LocalDocRagFrontend() {
       id: `user-${Date.now()}`,
       role: "user",
       content: trimmed,
-      citations: [],
     };
 
     setMessages((prev) => [...prev, userMessage]);
     setQuery("");
     setSubmitting(true);
+    setGlobalError("");
 
     try {
       const res = await fetch(`${API_BASE}/ask`, {
@@ -155,24 +403,31 @@ export default function LocalDocRagFrontend() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ query: trimmed }),
+        body: JSON.stringify({
+          query: trimmed,
+          session_id: sessionId,
+        }),
       });
 
-      const data = await res.json();
-
+      const text = await res.text();
+      const data = safeJsonParse(text, {});
       if (!res.ok) {
         throw new Error(data.detail || "提问失败");
       }
 
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: `assistant-${Date.now()}`,
-          role: "assistant",
-          content: data.answer || "未返回答案。",
-          citations: data.citations || [],
-        },
-      ]);
+      const assistantMessage = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: data.answer || "未返回答案。",
+        citations: data.citations || [],
+        reflections: data.reflections || [],
+        trace: data.trace || [],
+        candidates: data.candidates || [],
+        retrieval_risk: data.retrieval_risk || null,
+        generation_risk: data.generation_risk || null,
+      };
+
+      setMessages((prev) => [...prev, assistantMessage]);
     } catch (e) {
       setMessages((prev) => [
         ...prev,
@@ -181,6 +436,11 @@ export default function LocalDocRagFrontend() {
           role: "assistant",
           content: `请求失败：${e.message}`,
           citations: [],
+          reflections: [],
+          trace: [],
+          candidates: [],
+          retrieval_risk: null,
+          generation_risk: null,
         },
       ]);
     } finally {
@@ -195,357 +455,224 @@ export default function LocalDocRagFrontend() {
     }
   };
 
-  const removeFile = async (filename) => {
-  try {
-    const res = await fetch(`${API_BASE}/files/${encodeURIComponent(filename)}`, {
-      method: "DELETE",
-    });
-    const data = await res.json();
-    setFiles(data.files || []);
-  } catch (e) {
-    console.error("删除文件失败", e);
-  }
-};
-
   return (
-    <div style={{ minHeight: "100vh", background: "#f8fafc", padding: 24 }}>
-      <div style={{ maxWidth: 1400, margin: "0 auto" }}>
-        <div
-          style={{
-            background: "#fff",
-            border: "1px solid #e2e8f0",
-            borderRadius: 24,
-            padding: 24,
-            marginBottom: 24,
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            gap: 16,
-          }}
-        >
+    <div className="page">
+      <div className="page-inner">
+        <header className="hero">
           <div>
-            <h1 style={{ margin: 0, fontSize: 28, color: "#0f172a" }}>
-              本地文档智能问答系统
-            </h1>
-            <p style={{ marginTop: 8, color: "#64748b" }}>
-              上传文档、查看索引状态，并基于已索引文件进行问答。
+            <h1>文档智能问答系统</h1>
+            <p>
+              便捷的文档检索服务
             </p>
           </div>
-          <div
-            style={{
-              background: "#f1f5f9",
-              borderRadius: 16,
-              padding: "10px 16px",
-              color: "#334155",
-            }}
-          >
-            已索引文件 <b>{indexedCount}</b> / {files.length}
+          <div className="hero-stats">
+            <div className="stat-card">
+              <span>已索引文件</span>
+              <strong>{indexedCount}</strong>
+            </div>
+            <div className="stat-card">
+              <span>文件总数</span>
+              <strong>{files.length}</strong>
+            </div>
+            <div className="stat-card">
+              <span>会话 ID</span>
+              <strong className="small">{sessionId}</strong>
+            </div>
           </div>
-        </div>
+        </header>
 
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 1fr",
-            gap: 24,
-          }}
-        >
-          <section
-            style={{
-              background: "#fff",
-              border: "1px solid #e2e8f0",
-              borderRadius: 24,
-              padding: 20,
-            }}
-          >
-            <div style={{ marginBottom: 16 }}>
-              <h2 style={{ margin: 0, fontSize: 22, color: "#0f172a" }}>
-                文件上传
-              </h2>
-              <p style={{ marginTop: 8, color: "#64748b" }}>
-                支持 PDF、DOCX、TXT，可拖拽上传或手动选择文件。
-              </p>
-            </div>
+        {globalError ? (
+          <div className="global-alert error">
+            <TriangleAlert size={16} />
+            <span>{globalError}</span>
+          </div>
+        ) : null}
 
-            <div
-              onDragOver={(e) => {
-                e.preventDefault();
-                setDragging(true);
-              }}
-              onDragLeave={() => setDragging(false)}
-              onDrop={onDrop}
-              style={{
-                border: dragging ? "2px dashed #38bdf8" : "2px dashed #cbd5e1",
-                background: dragging ? "#f0f9ff" : "#f8fafc",
-                borderRadius: 24,
-                padding: 32,
-                textAlign: "center",
-              }}
-            >
-              <div style={{ marginBottom: 12 }}>
-                <FileText size={36} color="#475569" />
-              </div>
-              <p style={{ margin: 0, fontSize: 18, color: "#1e293b" }}>
-                拖动文件到此处上传
-              </p>
-              <p style={{ marginTop: 8, color: "#64748b" }}>
-                或点击下方按钮选择文件
-              </p>
+        <div className="layout">
+          <aside className="sidebar">
+            <div className="sidebar-top">
+              <section className="panel side-equal-panel">
+                <div className="panel-head upload-panel-head">
+                  <h2>文件上传</h2>
+                  <span className="upload-format-inline">支持格式：PDF、DOCX、TXT</span>
+                </div>
 
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                style={{
-                  marginTop: 20,
-                  background: "#0f172a",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 14,
-                  padding: "10px 16px",
-                  cursor: "pointer",
-                }}
-              >
-                {uploading ? "上传中..." : "选择文件上传"}
-              </button>
-
-              <input
-                ref={fileInputRef}
-                type="file"
-                multiple
-                accept={acceptedTypes}
-                onChange={onFilesSelected}
-                style={{ display: "none" }}
-              />
-            </div>
-
-            <div style={{ marginTop: 24 }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: 12,
-                }}
-              >
-                <h3 style={{ margin: 0, color: "#1e293b" }}>已上传文件</h3>
-                <span style={{ color: "#64748b" }}>共 {files.length} 个</span>
-              </div>
-
-              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                {files.length === 0 ? (
-                  <div
-                    style={{
-                      border: "1px solid #e2e8f0",
-                      borderRadius: 18,
-                      background: "#f8fafc",
-                      padding: 24,
-                      textAlign: "center",
-                      color: "#64748b",
-                    }}
-                  >
-                    暂无文件，请先上传文档。
-                  </div>
-                ) : (
-                  files.map((file) => {
-                    const conf = statusConfig[file.status] || statusConfig.upload_failed;
-
-                    return (
-                      <div
-                        key={file.name}
-                        style={{
-                          border: "1px solid #e2e8f0",
-                          borderRadius: 18,
-                          background: "#fff",
-                          padding: 16,
-                        }}
-                      >
-                        <div
-                          style={{
-                            display: "flex",
-                            justifyContent: "space-between",
-                            gap: 16,
-                            alignItems: "flex-start",
-                          }}
-                        >
-                          <div style={{ flex: 1 }}>
-                            <div style={{ fontWeight: 600, color: "#1e293b" }}>
-                              {file.name}
-                            </div>
-                            {file.error ? (
-                              <div style={{ marginTop: 8, color: "#dc2626", fontSize: 13 }}>
-                                {file.error}
-                              </div>
-                            ) : null}
-                          </div>
-
-                          <button
-                            onClick={() => conf.retryable && retryIndex(file.name)}
-                            style={{
-                              border: "1px solid #cbd5e1",
-                              borderRadius: 999,
-                              padding: "6px 12px",
-                              cursor: conf.retryable ? "pointer" : "default",
-                              background: "#fff",
-                            }}
-                          >
-                            {conf.label}
-                          </button>
-
-                          <button
-                            onClick={() => removeFile(file.name)}
-                            style={{
-                              border: "1px solid #cbd5e1",
-                              borderRadius: 999,
-                              padding: "6px 12px",
-                              cursor: "pointer",
-                              background: "#fff",
-                              marginLeft: 8,
-                            }}
-                          >
-                            移除文件
-                        </button>
-                        </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
-            </div>
-          </section>
-
-          <section
-            style={{
-              background: "#fff",
-              border: "1px solid #e2e8f0",
-              borderRadius: 24,
-              padding: 20,
-              display: "flex",
-              flexDirection: "column",
-              minHeight: 760,
-            }}
-          >
-            <div style={{ marginBottom: 16 }}>
-              <h2 style={{ margin: 0, fontSize: 22, color: "#0f172a" }}>
-                问答页面
-              </h2>
-              <p style={{ marginTop: 8, color: "#64748b" }}>
-                输入查询后，系统返回最终回答。
-              </p>
-            </div>
-
-            <div
-              style={{
-                flex: 1,
-                border: "1px solid #e2e8f0",
-                borderRadius: 24,
-                background: "#f8fafc",
-                padding: 16,
-                overflow: "auto",
-                minHeight: 520,
-              }}
-            >
-              {messages.map((msg) => (
                 <div
-                  key={msg.id}
-                  style={{
-                    display: "flex",
-                    justifyContent: msg.role === "user" ? "flex-end" : "flex-start",
-                    marginBottom: 16,
+                  className={`upload-box ${dragging ? "dragging" : ""}`}
+                  onDragOver={(e) => {
+                    e.preventDefault();
+                    setDragging(true);
                   }}
+                  onDragLeave={() => setDragging(false)}
+                  onDrop={onDrop}
                 >
-                  <div
-                    style={{
-                      maxWidth: "85%",
-                      borderRadius: 20,
-                      padding: 14,
-                      background: msg.role === "user" ? "#0f172a" : "#fff",
-                      color: msg.role === "user" ? "#fff" : "#1e293b",
-                      border: msg.role === "user" ? "none" : "1px solid #e2e8f0",
-                    }}
-                  >
-                    <div style={{ whiteSpace: "pre-wrap", lineHeight: 1.8 }}>
-                      {msg.content}
-                    </div>
-
-                    {msg.role === "assistant" && msg.citations?.length > 0 ? (
-                      <div
-                        style={{
-                          marginTop: 12,
-                          border: "1px solid #e2e8f0",
-                          borderRadius: 16,
-                          padding: 12,
-                          background: "#f8fafc",
-                          color: "#475569",
-                          fontSize: 13,
-                        }}
-                      >
-                        <div style={{ fontWeight: 600, marginBottom: 8 }}>参考来源</div>
-                        {msg.citations.map((c) => (
-                          <div key={`${msg.id}-${c.index}`} style={{ marginBottom: 8 }}>
-                            <div style={{ fontWeight: 600 }}>
-                              [{c.index}] {c.source}
-                            </div>
-                            <div>{c.excerpt}</div>
-                          </div>
-                        ))}
-                      </div>
-                    ) : null}
+                  <div className="upload-box-fill">
+                    <Upload size={20} />
+                    <div className="upload-title">拖拽文件到这里或点击下方按钮上传</div>
+                    <button
+                      className="primary-btn upload-btn"
+                      onClick={() => fileInputRef.current?.click()}
+                      disabled={uploading}
+                    >
+                      {uploading ? (
+                        <>
+                          <Loader2 size={16} className="spin" />
+                          上传中...
+                        </>
+                      ) : (
+                        <>
+                          <Upload size={16} />
+                          选择文件
+                        </>
+                      )}
+                    </button>
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept={acceptedTypes}
+                      multiple
+                      hidden
+                      onChange={onFilesSelected}
+                    />
                   </div>
                 </div>
-              ))}
+              </section>
 
-              {submitting ? (
-                <div style={{ color: "#64748b" }}>正在生成回答...</div>
-              ) : null}
+              <section className="panel side-equal-panel">
+                <div className="panel-head">
+                  <h2>文件列表</h2>
+                  <button className="ghost-btn" onClick={fetchFiles} disabled={loadingFiles}>
+                    <RefreshCw size={16} className={loadingFiles ? "spin" : ""} />
+                    刷新
+                  </button>
+                </div>
+
+                <div className="file-scroll-area">
+                  {files.length === 0 ? (
+                    <div className="empty-box">
+                      <FileText size={18} />
+                      <span>暂无文件，请先上传文档。</span>
+                    </div>
+                  ) : (
+                    <div className="file-list">
+                      {files.map((file) => {
+                        const conf = statusConfig[file.status] || statusConfig.upload_failed;
+                        const Icon = conf.icon || CircleHelp;
+
+                        return (
+                          <div className="file-card" key={file.name}>
+                            <div className="file-main">
+                              <div className="file-name-row">
+                                <FileText size={16} />
+                                <span className="file-name">{file.name}</span>
+                              </div>
+
+                              <div className="file-side-actions">
+                                <div className={`${conf.className} file-status-pill`}>
+                                  <Icon
+                                    size={14}
+                                    className={file.status === "indexing" ? "spin" : ""}
+                                  />
+                                  <span>{conf.label}</span>
+                                </div>
+
+                                {conf.retryable ? (
+                                  <button
+                                    className="small-btn file-action-btn"
+                                    onClick={() => retryIndex(file.name)}
+                                  >
+                                    <RefreshCw size={14} />
+                                    重试索引
+                                  </button>
+                                ) : (
+                                  <button
+                                    className="small-btn danger file-action-btn"
+                                    onClick={() => removeFile(file.name)}
+                                  >
+                                    <Trash2 size={14} />
+                                    删除
+                                  </button>
+                                )}
+                              </div>
+                            </div>
+
+                            {file.error ? <div className="file-error">{file.error}</div> : null}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              </section>
             </div>
+          </aside>
 
-            <div
-              style={{
-                marginTop: 16,
-                border: "1px solid #e2e8f0",
-                borderRadius: 24,
-                background: "#fff",
-                padding: 12,
-              }}
-            >
-              <div style={{ display: "flex", gap: 12, alignItems: "flex-end" }}>
-                <textarea
-                  value={query}
-                  onChange={(e) => setQuery(e.target.value)}
-                  onKeyDown={onKeyDown}
-                  rows={3}
-                  placeholder={
-                    indexedCount > 0
-                      ? "请输入你的查询，例如：这份文档的核心结论是什么？"
-                      : "请先上传并索引文档，再开始提问"
-                  }
-                  style={{
-                    flex: 1,
-                    minHeight: 84,
-                    resize: "none",
-                    borderRadius: 16,
-                    border: "1px solid #cbd5e1",
-                    padding: 12,
-                    fontSize: 14,
-                  }}
-                />
-                <button
-                  onClick={handleSend}
-                  disabled={submitting || !query.trim()}
-                  style={{
-                    height: 84,
-                    padding: "0 20px",
-                    borderRadius: 16,
-                    border: "none",
-                    background: "#0f172a",
-                    color: "#fff",
-                    cursor: submitting || !query.trim() ? "not-allowed" : "pointer",
-                    opacity: submitting || !query.trim() ? 0.5 : 1,
-                  }}
-                >
-                  发送
-                </button>
+          <main className="main">
+            <section className="panel chat-panel">
+              <div className="panel-head">
+                <h2>问答页面</h2>
+                <span className="panel-sub">
+                  保留原检索流程，只在生成阶段使用 Self-RAG
+                </span>
               </div>
-            </div>
-          </section>
+
+              <div className="chat-window" ref={chatRef}>
+                {messages.map((msg) =>
+                  msg.role === "assistant" ? (
+                    <AssistantMessage key={msg.id} msg={msg} />
+                  ) : (
+                    <UserMessage key={msg.id} msg={msg} />
+                  )
+                )}
+
+                {submitting ? (
+                  <div className="message assistant">
+                    <div className="avatar"><Bot size={18} /></div>
+                    <div className="bubble-wrap">
+                      <div className="bubble loading-bubble">
+                        <Loader2 size={16} className="spin" />
+                        正在生成回答...
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
+              </div>
+
+              <div className="composer">
+                <div className="composer-tip">
+                  <Search size={14} />
+                  <span>
+                    {indexedCount > 0
+                      ? "请输入你的问题，例如：这份文档的核心结论是什么？"
+                      : "请先上传并索引文档，再开始提问"}
+                  </span>
+                </div>
+
+                <div className="composer-row">
+                  <textarea
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
+                    onKeyDown={onKeyDown}
+                    rows={4}
+                    placeholder={
+                      indexedCount > 0
+                        ? "请输入你的问题..."
+                        : "请先上传并索引文档"
+                    }
+                    disabled={indexedCount === 0 || submitting}
+                  />
+                  <button
+                    className="send-btn"
+                    onClick={handleSend}
+                    disabled={submitting || !query.trim() || indexedCount === 0}
+                  >
+                    {submitting ? <Loader2 size={18} className="spin" /> : <Send size={18} />}
+                    <span>发送</span>
+                  </button>
+                </div>
+              </div>
+            </section>
+          </main>
         </div>
       </div>
     </div>

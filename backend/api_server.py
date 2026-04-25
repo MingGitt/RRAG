@@ -1,9 +1,8 @@
-# api_server.py
 import os
+import re
 import threading
-import traceback
 from pathlib import Path
-from typing import Dict, List, Optional, Any
+from typing import Dict, List, Optional
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -15,21 +14,16 @@ from config import (
     CHUNK_SIZE,
     LOCAL_DOCS_DIR,
     PERSIST_DIR,
-    SELF_RAG_EAS_URL,
-    SELF_RAG_EAS_TOKEN,
 )
 from data_loader import MultiFormatLoader
+from generator import Generator
 from hybrid_retriever import MultiVectorRetriever
 from pipeline_executor import run_parallel_retrieval_pipeline
-from qa_service import answer_one_query
+from qwen_client import QwenClient
 from reranker import Reranker
-from risk_controller import RiskController
+from retrieval_judge import RetrievalJudge
 from vector_store import VectorStoreBuilder
 
-
-# =========================
-# 路径初始化
-# =========================
 
 BASE_DIR = Path(LOCAL_DOCS_DIR)
 BASE_DIR.mkdir(parents=True, exist_ok=True)
@@ -41,37 +35,16 @@ PERSIST_ROOT = Path(PERSIST_DIR)
 PERSIST_ROOT.mkdir(parents=True, exist_ok=True)
 
 
-# =========================
-# FastAPI
-# =========================
-
-app = FastAPI(title="Local Document QA API", version="7.0.0")
+app = FastAPI(title="Local Document QA API", version="6.1.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # 生产环境建议改成前端域名
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-# =========================
-# 全局状态
-# =========================
-
-app_state = {
-    "files": {},           # filename -> record
-    "file_indexes": {},    # file_id -> index_obj
-    "reranker": None,
-    "reranker_lock": threading.Lock(),
-    "sessions": {},        # session_id -> history list
-}
-
-
-# =========================
-# Pydantic Models
-# =========================
 
 class FileRecord(BaseModel):
     name: str
@@ -89,8 +62,6 @@ class CitationItem(BaseModel):
     index: int
     source: str
     excerpt: str
-    doc_id: str = ""
-    page_no: int = 0
 
 
 class ReflectionItem(BaseModel):
@@ -100,7 +71,7 @@ class ReflectionItem(BaseModel):
     issup: str
     isuse: int
     followup_query: str = "None"
-    raw_text: str = ""
+    raw_text: str
 
 
 class TraceItem(BaseModel):
@@ -114,20 +85,19 @@ class TraceItem(BaseModel):
 
 
 class CandidateItem(BaseModel):
-    answer: str
-    evidence_score: float
-    final_score: float
-    retrieve: str
-    isrel: str
-    issup: str
-    isuse: int
+    answer: str = ""
+    retrieve: str = "Unknown"
+    isrel: str = "Unknown"
+    issup: str = "Unknown"
+    isuse: int = 1
+    evidence_score: float = 0.0
+    final_score: float = 0.0
 
 
-class RiskItem(BaseModel):
-    risk_score: float
-    risk_level: str
-    reasons: List[str]
-    confidence: Optional[float] = None
+class RiskInfo(BaseModel):
+    risk_level: str = "unknown"
+    risk_score: float = 0.0
+    detail: str = ""
 
 
 class AskResponse(BaseModel):
@@ -136,13 +106,18 @@ class AskResponse(BaseModel):
     reflections: List[ReflectionItem]
     trace: List[TraceItem]
     candidates: List[CandidateItem] = []
-    retrieval_risk: Optional[RiskItem] = None
-    generation_risk: Optional[RiskItem] = None
+    retrieval_risk: Optional[RiskInfo] = None
+    generation_risk: Optional[RiskInfo] = None
 
 
-# =========================
-# 工具函数
-# =========================
+app_state = {
+    "files": {},
+    "file_indexes": {},
+    "reranker": None,
+    "reranker_lock": threading.Lock(),
+    "sessions": {},
+}
+
 
 def allowed_file(filename: str) -> bool:
     suffix = Path(filename).suffix.lower()
@@ -152,157 +127,6 @@ def allowed_file(filename: str) -> bool:
 def get_loader():
     return MultiFormatLoader(max_chunk_size=CHUNK_SIZE, overlap=CHUNK_OVERLAP)
 
-
-def format_source(meta: dict, doc_id: str) -> str:
-    title = meta.get("title", "") if meta else ""
-    page_no = int(meta.get("page_no", 0)) if meta else 0
-    source = title if title else doc_id
-    if page_no > 0:
-        source = f"{source} | page {page_no}"
-    return source
-
-
-def get_session_history(session_id: str) -> List[Dict[str, str]]:
-    if session_id not in app_state["sessions"]:
-        app_state["sessions"][session_id] = []
-    return app_state["sessions"][session_id]
-
-
-def find_file_id_by_filename(filename: str) -> Optional[str]:
-    for file_id, index_obj in app_state["file_indexes"].items():
-        if index_obj.get("filename") == filename:
-            return file_id
-    return None
-
-
-def build_retriever() -> MultiVectorRetriever:
-    if not app_state["file_indexes"]:
-        raise HTTPException(status_code=400, detail="当前没有已索引文档。")
-
-    return MultiVectorRetriever(
-        file_indexes=app_state["file_indexes"],
-        alpha=ALPHA
-    )
-
-
-def to_risk_item(data: Optional[Dict[str, Any]]) -> Optional[RiskItem]:
-    if not data:
-        return None
-    return RiskItem(
-        risk_score=float(data.get("risk_score", 1.0)),
-        risk_level=data.get("risk_level", "high"),
-        reasons=data.get("reasons", []),
-        confidence=(
-            float(data.get("confidence", 0.0))
-            if data.get("confidence") is not None
-            else None
-        ),
-    )
-
-
-def build_citations(gen_output: Dict[str, Any]) -> List[CitationItem]:
-    citations = []
-    for item in gen_output.get("citations", []):
-        citations.append(
-            CitationItem(
-                index=int(item.get("index", 0)),
-                source=item.get("source", ""),
-                excerpt=item.get("excerpt", ""),
-                doc_id=item.get("doc_id", ""),
-                page_no=int(item.get("page_no", 0) or 0),
-            )
-        )
-    return citations
-
-
-def build_reflections(gen_output: Dict[str, Any]) -> List[ReflectionItem]:
-    reflections = []
-    if gen_output:
-        ref = gen_output.get("reflections", {})
-        reflections.append(
-            ReflectionItem(
-                round=1,
-                retrieve=ref.get("retrieve", "Unknown"),
-                isrel=ref.get("isrel", "Unknown"),
-                issup=ref.get("issup", "Unknown"),
-                isuse=int(ref.get("isuse", 1)),
-                followup_query=ref.get("followup_query", "None"),
-                raw_text=gen_output.get("raw_text", ""),
-            )
-        )
-    return reflections
-
-
-def build_candidates(gen_output: Dict[str, Any]) -> List[CandidateItem]:
-    items = []
-    for item in gen_output.get("candidates", []):
-        items.append(
-            CandidateItem(
-                answer=item.get("answer", ""),
-                evidence_score=float(item.get("evidence_score", 0.0)),
-                final_score=float(item.get("final_score", 0.0)),
-                retrieve=item.get("retrieve", "Unknown"),
-                isrel=item.get("isrel", "Unknown"),
-                issup=item.get("issup", "Unknown"),
-                isuse=int(item.get("isuse", 1)),
-            )
-        )
-    return items
-
-
-def build_trace(
-    query_text: str,
-    ranked_chunks: List[Dict[str, Any]],
-    query_type_stats: Dict[str, Any],
-    retrieval_risk: Dict[str, Any],
-    generation_risk: Optional[Dict[str, Any]],
-) -> List[TraceItem]:
-    top_sources = []
-    for item in ranked_chunks[:5]:
-        top_sources.append(
-            format_source(item.get("meta", {}), item.get("doc_id", "unknown_doc"))
-        )
-
-    trace = [
-        TraceItem(
-            stage="retrieval_pipeline",
-            query=query_text,
-            round=1,
-            retrieve="Yes" if ranked_chunks else "No",
-            retrieved_count=len(ranked_chunks),
-            top_sources=top_sources,
-        ),
-        TraceItem(
-            stage="query_routing",
-            detail=str(query_type_stats),
-        ),
-        TraceItem(
-            stage="retrieval_risk",
-            detail=(
-                f"risk_level={retrieval_risk.get('risk_level', 'unknown')}, "
-                f"risk_score={retrieval_risk.get('risk_score', 1.0)}"
-            ),
-        ),
-    ]
-
-    if generation_risk:
-        trace.append(
-            TraceItem(
-                stage="generation_risk",
-                detail=(
-                    f"risk_level={generation_risk.get('risk_level', 'unknown')}, "
-                    f"risk_score={generation_risk.get('risk_score', 1.0)}, "
-                    f"confidence={generation_risk.get('confidence', 0.0)}"
-                ),
-            )
-        )
-
-    return trace
-
-
-# =========================
-# 建库 / 恢复索引
-# =========================
 
 def build_single_uploaded_file_index(file_path: str, filename: str):
     loader = get_loader()
@@ -370,12 +194,14 @@ def rebuild_existing_files_on_startup():
             index_obj["filename"] = path.name
 
             app_state["file_indexes"][file_id] = index_obj
+
             app_state["files"][path.name] = FileRecord(
                 name=path.name,
                 path=str(path),
                 status="indexed",
                 error=""
             ).dict()
+            app_state["files"][path.name]["file_id"] = file_id
 
             print(f"[STARTUP] indexed {path.name}, file_id={file_id}, chunks={len(chunks)}")
 
@@ -389,18 +215,259 @@ def rebuild_existing_files_on_startup():
             ).dict()
 
 
-# =========================
-# 生命周期
-# =========================
+def find_file_id_by_filename(filename: str):
+    for file_id, index_obj in app_state["file_indexes"].items():
+        if index_obj.get("filename") == filename:
+            return file_id
+    return None
+
+
+def build_retriever():
+    if not app_state["file_indexes"]:
+        raise HTTPException(status_code=400, detail="当前没有已索引文档。")
+
+    return MultiVectorRetriever(
+        file_indexes=app_state["file_indexes"],
+        alpha=ALPHA
+    )
+
+
+def get_session_history(session_id: str) -> List[Dict]:
+    if session_id not in app_state["sessions"]:
+        app_state["sessions"][session_id] = []
+    return app_state["sessions"][session_id]
+
+
+def history_to_text(history: List[Dict]) -> str:
+    if not history:
+        return ""
+    lines = []
+    for item in history[-6:]:
+        role = item.get("role", "user")
+        content = (item.get("content") or "").strip()
+        if content:
+            lines.append(f"{role}: {content}")
+    return "\n".join(lines).strip()
+
+
+def compact_assistant_history(text: str, max_len: int = 180) -> str:
+    if not text:
+        return ""
+
+    text = " ".join(str(text).split())
+
+    bad_patterns = [
+        r"\[\d+\]\s*来源[:：].*?(?=\[\d+\]|\Z)",
+        r"\[\d+\]\s*Source:.*?(?=\[\d+\]|\Z)",
+        r"The evidence includes.*",
+        r"From the current evidence.*",
+        r"根据当前证据.*",
+        r"从当前证据来看.*",
+    ]
+    for p in bad_patterns:
+        text = re.sub(p, "", text, flags=re.IGNORECASE | re.DOTALL)
+
+    text = " ".join(text.split())
+    if len(text) <= max_len:
+        return text
+    return text[:max_len].rstrip() + "..."
+
+
+def direct_answer_by_llm(query_text: str, history: List[Dict]) -> str:
+    history_text = history_to_text(history)
+
+    prompt = f"""
+你是一个问答助手。
+
+历史对话：
+{history_text if history_text else "无"}
+
+当前问题：
+{query_text}
+
+请直接给出自然语言回答，不要输出额外标签。
+""".strip()
+
+    answer = QwenClient.call(
+        [{"role": "user", "content": prompt}],
+        temperature=0.2,
+        max_tokens=512,
+    )
+    return answer or "抱歉，我暂时无法生成回答。"
+
+
+def _safe_float(val, default=0.0):
+    try:
+        return float(val)
+    except Exception:
+        return default
+
+
+def _safe_int(val, default=1):
+    try:
+        return int(val)
+    except Exception:
+        return default
+
+
+async def answer_one_query_api(query_text: str, session_id: str = "default"):
+    history = get_session_history(session_id)
+
+    trace: List[TraceItem] = []
+    reflections: List[ReflectionItem] = []
+    candidates: List[CandidateItem] = []
+    citations: List[CitationItem] = []
+
+    initial_decision = RetrievalJudge.decide_retrieval(
+        user_query=query_text,
+        history_text=history_to_text(history),
+    )
+
+    trace.append(
+        TraceItem(
+            stage="initial_decision",
+            query=query_text,
+            round=1,
+            retrieve=initial_decision,
+            detail="使用 RetrievalJudge + 原 LLM 判断是否需要进入检索流程",
+        )
+    )
+
+    if initial_decision == "No":
+        answer = direct_answer_by_llm(query_text, history)
+
+        history.append({"role": "user", "content": query_text})
+        history.append({"role": "assistant", "content": compact_assistant_history(answer)})
+
+        return AskResponse(
+            answer=answer,
+            citations=[],
+            reflections=[],
+            trace=trace,
+            candidates=[],
+            retrieval_risk=None,
+            generation_risk=None,
+        )
+
+    if not app_state["file_indexes"]:
+        raise HTTPException(status_code=400, detail="当前没有已索引文档，无法执行检索。")
+
+    try:
+        if app_state["reranker"] is None:
+            app_state["reranker"] = Reranker()
+
+        retriever = build_retriever()
+        qid = f"api_query_{session_id}"
+        queries = {qid: query_text}
+
+        rerank_results_with_scores, generation_chunks, ranked_chunks_map, query_type_stats = run_parallel_retrieval_pipeline(
+            queries=queries,
+            retriever=retriever,
+            reranker=app_state["reranker"],
+            reranker_lock=app_state["reranker_lock"],
+            query_workers=1,
+            subquery_workers=1,
+        )
+
+        trace.append(
+            TraceItem(
+                stage="retrieval_pipeline",
+                query=query_text,
+                round=1,
+                retrieve="Yes",
+                retrieved_count=len(ranked_chunks_map.get(qid, [])),
+                top_sources=[
+                    f'{item["meta"].get("title", item["doc_id"])}'
+                    for item in ranked_chunks_map.get(qid, [])[:5]
+                ],
+                detail=f"已进入原检索链路，query_type_stats={query_type_stats}",
+            )
+        )
+
+        gen_outputs = await Generator.run(
+            queries,
+            generation_chunks,
+            max_samples=1,
+            max_concurrency=1
+        )
+
+        gen_output = gen_outputs.get(qid, {})
+        answer = gen_output.get("answer", "")
+
+        history.append({"role": "user", "content": query_text})
+        history.append({"role": "assistant", "content": compact_assistant_history(answer)})
+
+        for item in gen_output.get("citations", []):
+            citations.append(
+                CitationItem(
+                    index=item["index"],
+                    source=item["source"],
+                    excerpt=item["excerpt"],
+                )
+            )
+
+        ref = gen_output.get("reflections", {})
+        if ref:
+            reflections.append(
+                ReflectionItem(
+                    round=1,
+                    retrieve=ref.get("retrieve", "Unknown"),
+                    isrel=ref.get("isrel", "Unknown"),
+                    issup=ref.get("issup", "Unknown"),
+                    isuse=_safe_int(ref.get("isuse", 1), 1),
+                    followup_query=ref.get("followup_query", "None"),
+                    raw_text=gen_output.get("raw_text", ""),
+                )
+            )
+
+        for item in gen_output.get("candidates", []):
+            candidates.append(
+                CandidateItem(
+                    answer=item.get("answer", ""),
+                    retrieve=item.get("retrieve", "Unknown"),
+                    isrel=item.get("isrel", "Unknown"),
+                    issup=item.get("issup", "Unknown"),
+                    isuse=_safe_int(item.get("isuse", 1), 1),
+                    evidence_score=_safe_float(item.get("evidence_score", 0.0), 0.0),
+                    final_score=_safe_float(item.get("final_score", 0.0), 0.0),
+                )
+            )
+
+        retrieval_risk = None
+        raw_retrieval_risk = gen_output.get("retrieval_risk")
+        if raw_retrieval_risk:
+            retrieval_risk = RiskInfo(
+                risk_level=raw_retrieval_risk.get("risk_level", "unknown"),
+                risk_score=_safe_float(raw_retrieval_risk.get("risk_score", 0.0), 0.0),
+                detail=raw_retrieval_risk.get("detail", ""),
+            )
+
+        generation_risk = None
+        raw_generation_risk = gen_output.get("generation_risk")
+        if raw_generation_risk:
+            generation_risk = RiskInfo(
+                risk_level=raw_generation_risk.get("risk_level", "unknown"),
+                risk_score=_safe_float(raw_generation_risk.get("risk_score", 0.0), 0.0),
+                detail=raw_generation_risk.get("detail", ""),
+            )
+
+        return AskResponse(
+            answer=answer,
+            citations=citations,
+            reflections=reflections,
+            trace=trace,
+            candidates=candidates,
+            retrieval_risk=retrieval_risk,
+            generation_risk=generation_risk,
+        )
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"问答失败: {str(e)}")
+
 
 @app.on_event("startup")
 def startup_event():
     print("[STARTUP] api server starting...")
-
-    if not SELF_RAG_EAS_URL:
-        print("[STARTUP][WARN] SELF_RAG_EAS_URL 未配置，生成阶段会失败。")
-    if not SELF_RAG_EAS_TOKEN:
-        print("[STARTUP][WARN] SELF_RAG_EAS_TOKEN 未配置，生成阶段会失败。")
 
     if app_state["reranker"] is None:
         app_state["reranker"] = Reranker()
@@ -414,15 +481,6 @@ def startup_event():
     print(f"[STARTUP] recovered indexes = {list(app_state['file_indexes'].keys())}")
 
 
-# =========================
-# 接口
-# =========================
-
-@app.get("/")
-def root():
-    return {"message": "Local Document QA API is running."}
-
-
 @app.get("/health")
 def health():
     return {
@@ -430,7 +488,6 @@ def health():
         "file_count": len(app_state["files"]),
         "index_count": len(app_state["file_indexes"]),
         "session_count": len(app_state["sessions"]),
-        "selfrag_configured": bool(SELF_RAG_EAS_URL and SELF_RAG_EAS_TOKEN),
     }
 
 
@@ -475,6 +532,7 @@ async def upload_files(files: List[UploadFile] = File(...)):
 
             app_state["files"][f.filename]["status"] = "indexed"
             app_state["files"][f.filename]["error"] = ""
+            app_state["files"][f.filename]["file_id"] = file_id
 
             print(f"[UPLOAD] indexed ok: filename={f.filename}, file_id={file_id}")
 
@@ -505,15 +563,20 @@ def retry_index(filename: str):
         app_state["files"][filename]["status"] = "indexing"
         app_state["files"][filename]["error"] = ""
 
-        old_file_id = find_file_id_by_filename(filename)
+        old_file_id = record.get("file_id")
+        if not old_file_id:
+            old_file_id = find_file_id_by_filename(filename)
+
         if old_file_id:
             VectorStoreBuilder.delete_single_file_index(old_file_id, str(PERSIST_ROOT))
-            del app_state["file_indexes"][old_file_id]
+            if old_file_id in app_state["file_indexes"]:
+                del app_state["file_indexes"][old_file_id]
 
         new_file_id = build_single_uploaded_file_index(path, filename)
 
         app_state["files"][filename]["status"] = "indexed"
         app_state["files"][filename]["error"] = ""
+        app_state["files"][filename]["file_id"] = new_file_id
 
         print(f"[RETRY] indexed ok: filename={filename}, file_id={new_file_id}")
 
@@ -532,17 +595,23 @@ def delete_file(filename: str):
 
     record = app_state["files"][filename]
     path = record.get("path", "")
+    target_file_id = record.get("file_id")
 
     try:
         if path and os.path.exists(path):
             os.remove(path)
             print(f"[DELETE] removed file: {path}")
 
-        target_file_id = find_file_id_by_filename(filename)
+        if not target_file_id:
+            target_file_id = find_file_id_by_filename(filename)
+
         if target_file_id:
             VectorStoreBuilder.delete_single_file_index(target_file_id, str(PERSIST_ROOT))
-            del app_state["file_indexes"][target_file_id]
+            if target_file_id in app_state["file_indexes"]:
+                del app_state["file_indexes"][target_file_id]
             print(f"[DELETE] removed index: file_id={target_file_id}")
+        else:
+            print(f"[DELETE][WARN] no file_id found for filename={filename}, index may remain on disk")
 
         del app_state["files"][filename]
 
@@ -555,70 +624,9 @@ def delete_file(filename: str):
 
 @app.post("/ask", response_model=AskResponse)
 async def ask(req: AskRequest):
-    query_text = (req.query or "").strip()
-    if not query_text:
+    query = req.query.strip()
+    if not query:
         raise HTTPException(status_code=400, detail="问题不能为空。")
 
-    if not app_state["file_indexes"]:
-        raise HTTPException(status_code=400, detail="当前没有已索引文档。")
-
     session_id = (req.session_id or "default").strip() or "default"
-
-    try:
-        if app_state["reranker"] is None:
-            app_state["reranker"] = Reranker()
-
-        retriever = build_retriever()
-
-        query_id = f"api_query_{session_id}"
-
-        result = answer_one_query(
-            query_id=query_id,
-            query_text=query_text,
-            retriever=retriever,
-            reranker=app_state["reranker"],
-            reranker_lock=app_state["reranker_lock"],
-        )
-
-        ranked_chunks_map = result.get("ranked_chunks_map", {}) or {}
-        gen_outputs = result.get("gen_outputs", {}) or {}
-        query_type_stats = result.get("query_type_stats", {}) or {}
-
-        ranked_chunks = ranked_chunks_map.get(query_id, []) or []
-        gen_output = gen_outputs.get(query_id, {}) or {}
-
-        # 会话记录
-        history = get_session_history(session_id)
-        history.append({"role": "user", "content": query_text})
-        history.append({"role": "assistant", "content": gen_output.get("answer", "")})
-
-        retrieval_risk_dict = RiskController.assess_retrieval_risk(ranked_chunks)
-        generation_risk_dict = gen_output.get("generation_risk")
-
-        citations = build_citations(gen_output)
-        reflections = build_reflections(gen_output)
-        candidates = build_candidates(gen_output)
-
-        trace = build_trace(
-            query_text=query_text,
-            ranked_chunks=ranked_chunks,
-            query_type_stats=query_type_stats,
-            retrieval_risk=retrieval_risk_dict,
-            generation_risk=generation_risk_dict,
-        )
-
-        return AskResponse(
-            answer=gen_output.get("answer", ""),
-            citations=citations,
-            reflections=reflections,
-            trace=trace,
-            candidates=candidates,
-            retrieval_risk=to_risk_item(retrieval_risk_dict),
-            generation_risk=to_risk_item(generation_risk_dict),
-        )
-
-    except HTTPException:
-        raise
-    except Exception as e:
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"问答失败: {str(e)}")
+    return await answer_one_query_api(query, session_id=session_id)
