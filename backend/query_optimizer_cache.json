@@ -309,7 +309,330 @@
     "实现小型数据库的什么功能": "fuzzy",
     "敬告青年这本书写了什么": "simple",
     "看了什么音乐剧": "fuzzy",
-    "我最喜欢什么音乐剧": "fuzzy"
+    "我最喜欢什么音乐剧": "fuzzy",
+    "Exploiting Autophagy to Live Longer": "simple",
+    "How to Reduce Exposure to Alkylphenols Through Your Diet": "fuzzy",
+    "What’s Driving America’s Obesity Problem?": "fuzzy",
+    "Do Cholesterol Statin Drugs Cause Breast Cancer?": "fuzzy",
+    "Who Should be Careful About Curcumin?": "fuzzy",
+    "Foods for Glaucoma": "simple",
+    "What is Actually in Chicken Nuggets?": "simple",
+    "What Do Meat Purge and Cola Have in Common?": "fuzzy",
+    "Stopping Heart Disease in Childhood": "fuzzy",
+    "Food Dyes and ADHD": "fuzzy",
+    "Chronic Headaches and Pork Parasites": "fuzzy",
+    "How Citrus Might Help Keep Your Hands Warm": "fuzzy",
+    "Starving Tumors of Their Blood Supply": "simple",
+    "Are Dental X-Rays Safe?": "simple",
+    "How Should I Take Probiotics?": "fuzzy",
+    "Breast Cancer & Alcohol: How Much is Safe?": "complex",
+    "Diet and Cellulite": "fuzzy",
+    "Best Treatment for Constipation": "fuzzy",
+    "Should We Avoid Titanium Dioxide?": "fuzzy",
+    "Avoiding Cooked Meat Carcinogens": "fuzzy",
+    "Plant-Based Diets for Psoriasis": "simple",
+    "Increasing Muscle Strength with Fenugreek": "simple",
+    "How Chemically Contaminated Are We?": "fuzzy",
+    "Treating an Enlarged Prostate With Diet": "fuzzy",
+    "Optimal Phytosterol Dose and Source": "complex",
+    "Is Caffeinated Tea Really Dehydrating?": "simple",
+    "Mercury Testing Recommended Before Pregnancy": "simple",
+    "Vitamin D: Shedding some light on the new recommendations": "fuzzy",
+    "Stool Size and Breast Cancer Risk": "fuzzy",
+    "Breast Cancer and Diet": "fuzzy",
+    "Can antioxidant-rich spices counteract the effects of a high-fat meal?": "complex",
+    "Dioxins Stored in Our Own Fat May Increase Diabetes Risk": "simple",
+    "Didn't another study show carnitine was good for the heart?": "fuzzy",
+    "Any update on the scary in vitro avocado data?": "fuzzy",
+    "What do you think of Dr. Jenkins' take on paleolithic diets?": "fuzzy",
+    "What about pepper plus turmeric in V8 juice?": "fuzzy",
+    "Is annatto food coloring safe?": "simple",
+    "Fresh fruit versus frozen--which is better?": "complex",
+    "Are krill oil supplements better than fish oil capsules?": "complex",
+    "Is apple cider vinegar good for you?": "fuzzy",
+    "How can you believe in any scientific study?": "fuzzy",
+    "Is vitamin D3 (cholecalciferol) preferable to D2 (ergocalciferol)?": "complex",
+    "adenovirus 36": "simple",
+    "accidents": "fuzzy",
+    "African-American": "fuzzy",
+    "airport scanners": "fuzzy",
+    "Alli": "fuzzy",
+    "alternative medicine": "fuzzy",
+    "American Dental Association": "simple",
+    "amnesia": "simple",
+    "aneurysm": "simple",
+    "antinutrients": "simple",
+    "anisakis": "simple",
+    "apnea": "fuzzy",
+    "Arkansas": "fuzzy",
+    "ascorbic acid": "simple",
+    "Atkins diet": "simple",
+    "avocados": "fuzzy",
+    "beans": "fuzzy",
+    "bagels": "fuzzy",
+    "benzene": "simple",
+    "betel nuts": "simple",
+    "black raspberries": "simple",
+    "bioavailability": "simple",
+    "blood clots": "fuzzy",
+    "BMAA": "fuzzy",
+    "bone fractures": "fuzzy",
+    "BPH": "fuzzy",
+    "BRCA genes": "simple",
+    "breast pain": "fuzzy",
+    "bronchiolitis obliterans": "simple",
+    "Bush administration": "fuzzy",
+    "cadaverine": "simple",
+    "caloric restriction": "simple",
+    "canker sores": "simple",
+    "carcinogens": "simple",
+    "carrageenan": "simple",
+    "cauliflower": "simple",
+    "chanterelle mushrooms": "simple",
+    "Chernobyl": "fuzzy",
+    "chickpeas": "simple",
+    "chlorophyll": "simple",
+    "cinnamon": "fuzzy",
+    "cocaine": "simple",
+    "coffee": "fuzzy",
+    "coma": "fuzzy",
+    "cooking methods": "fuzzy",
+    "cortisol": "simple",
+    "crib death": "fuzzy",
+    "cumin": "simple",
+    "Czechoslovakia": "simple",
+    "deafness": "simple",
+    "DHA": "fuzzy",
+    "dietary scoring": "fuzzy",
+    "domoic acid": "simple",
+    "Dr. Dean Ornish": "simple",
+    "Dr. Walter Willett": "simple",
+    "ECMO": "simple",
+    "eggnog": "simple",
+    "endocrine disruptors": "simple",
+    "ergothioneine": "simple",
+    "energy drinks": "fuzzy",
+    "Evidence-based medicine": "simple",
+    "factory farming practices": "fuzzy",
+    "fava beans": "simple",
+    "fenugreek": "simple",
+    "Finland": "fuzzy",
+    "flax oil": "simple",
+    "folic acid": "simple",
+    "Fosamax": "simple",
+    "fructose": "simple",
+    "galactosemia": "simple",
+    "genetic manipulation": "fuzzy",
+    "Global Burden of Disease Study": "simple",
+    "goji berries": "simple",
+    "grapes": "fuzzy",
+    "growth promoters": "fuzzy",
+    "halibut": "simple",
+    "Harvard Physicians’ Study II": "simple",
+    "hearing": "fuzzy",
+    "heme iron": "simple",
+    "hernia": "simple",
+    "Hiroshima": "fuzzy",
+    "hormonal dysfunction": "simple",
+    "hyperactivity": "fuzzy",
+    "IGF-1": "simple",
+    "industrial toxins": "fuzzy",
+    "insects": "fuzzy",
+    "Iowa Women’s Health Study": "simple",
+    "Japan": "fuzzy",
+    "kidney beans": "simple",
+    "junk food": "fuzzy",
+    "kohlrabi": "simple",
+    "lard": "fuzzy",
+    "leeks": "fuzzy",
+    "leucine": "simple",
+    "Lindane": "simple",
+    "liver disease": "fuzzy",
+    "low-carb diets": "fuzzy",
+    "lyme disease": "simple",
+    "magnesium": "simple",
+    "maple syrup": "simple",
+    "mastitis": "simple",
+    "medical ethics": "fuzzy",
+    "memory": "fuzzy",
+    "mesquite": "fuzzy",
+    "Mevacor": "simple",
+    "milk": "fuzzy",
+    "molasses": "simple",
+    "mouth cancer": "simple",
+    "muscle health": "fuzzy",
+    "myelopathy": "simple",
+    "National Academy of Sciences": "simple",
+    "Native Americans": "fuzzy",
+    "neurocysticercosis": "simple",
+    "NIH-AARP study": "fuzzy",
+    "norovirus": "simple",
+    "nuts": "fuzzy",
+    "okra": "fuzzy",
+    "oral intraepithelial neoplasia": "simple",
+    "organotins": "simple",
+    "oxen meat": "fuzzy",
+    "Panama": "fuzzy",
+    "Parkinson's disease": "simple",
+    "peanut butter": "fuzzy",
+    "Peoria": "fuzzy",
+    "pesticides": "fuzzy",
+    "philippines": "fuzzy",
+    "phytic acid": "simple",
+    "pineapples": "fuzzy",
+    "plant-based diet": "fuzzy",
+    "poisonous plants": "fuzzy",
+    "polypropylene plastic": "simple",
+    "pork": "fuzzy",
+    "poultry workers": "fuzzy",
+    "prenatal vitamins": "simple",
+    "prolactin": "simple",
+    "prunes": "fuzzy",
+    "pumpkin": "fuzzy",
+    "quinine": "simple",
+    "rapamycin": "simple",
+    "red tea": "fuzzy",
+    "rhabdomyolysis": "simple",
+    "rickets": "simple",
+    "Rutin": "simple",
+    "salmon": "fuzzy",
+    "saturated fat": "simple",
+    "seafood": "fuzzy",
+    "serotonin": "simple",
+    "shelf life": "fuzzy",
+    "sirtuins": "simple",
+    "smoking": "fuzzy",
+    "soil health": "fuzzy",
+    "spearmint": "simple",
+    "Splenda": "simple",
+    "St. John's wort": "simple",
+    "stevia": "simple",
+    "subsidies": "fuzzy",
+    "sulfur": "fuzzy",
+    "suppositories": "fuzzy",
+    "sweeteners": "fuzzy",
+    "taro": "fuzzy",
+    "tempeh": "simple",
+    "thiamine": "simple",
+    "titanium dioxide": "simple",
+    "tongue worm": "simple",
+    "trans fats": "simple",
+    "Tufts": "fuzzy",
+    "turnips": "fuzzy",
+    "ultra-processed foods": "simple",
+    "uterine health": "fuzzy",
+    "veal": "fuzzy",
+    "veggie chicken": "fuzzy",
+    "viral infections": "simple",
+    "vitamin K": "simple",
+    "walnut oil": "simple",
+    "weight gain": "fuzzy",
+    "whiting": "fuzzy",
+    "worms": "fuzzy",
+    "Yale": "fuzzy",
+    "Zoloft": "simple",
+    "Preventing Brain Loss with B Vitamins?": "fuzzy",
+    "More Than an Apple a Day: Combating Common Diseases": "fuzzy",
+    "Are Organic Foods Safer?": "fuzzy",
+    "Diabetes as a Disease of Fat Toxicity": "simple",
+    "Is Milk Good for Our Bones?": "fuzzy",
+    "Preventing Ulcerative Colitis with Diet": "fuzzy",
+    "The Actual Benefit of Diet vs. Drugs": "complex",
+    "The Saturated Fat Studies: Buttering Up the Public": "fuzzy",
+    "Coffee and Artery Function": "fuzzy",
+    "Caloric Restriction vs. Plant-Based Diets": "complex",
+    "Infectobesity: Adenovirus 36 and Childhood Obesity": "simple",
+    "Does Cholesterol Size Matter?": "fuzzy",
+    "Barriers to Heart Disease Prevention": "simple",
+    "Childhood Constipation and Cow’s Milk": "simple",
+    "Academy of Nutrition and Dietetics Conflicts of Interest": "simple",
+    "Diabetics Should Take Their Pulses": "fuzzy",
+    "Do Vegetarians Get Enough Protein?": "simple",
+    "Eggs and Arterial Function": "simple",
+    "Treating Asthma With Plants vs. Supplements?": "complex",
+    "Phytates for the Treatment of Cancer": "simple",
+    "Alkylphenol Endocrine Disruptors and Allergies": "fuzzy",
+    "Chicken Salmonella Thanks to Meat Industry Lawsuit": "fuzzy",
+    "Turmeric Curcumin and Osteoarthritis": "simple",
+    "How Long to Detox From Fish Before Pregnancy?": "fuzzy",
+    "Is Caramel Color Carcinogenic?": "simple",
+    "Counteracting the Effects of Dioxins Through Diet": "fuzzy",
+    "Chronic Headaches and Pork Tapeworms": "fuzzy",
+    "Heart Disease Starts in Childhood": "simple",
+    "Artificial Food Colors and ADHD": "simple",
+    "Keeping Your Hands Warm With Citrus": "fuzzy",
+    "Anti-Angiogenesis: Cutting Off Tumor Supply Lines": "simple",
+    "Cancer Risk From CT Scan Radiation": "simple",
+    "Preventing the Common Cold with Probiotics?": "fuzzy",
+    "Eating Healthy on a Budget": "fuzzy",
+    "Flaxseeds & Breast Cancer Survival: Clinical Evidence": "simple",
+    "Do Fruit & Nut Bars Cause Weight Gain?": "fuzzy",
+    "Titanium Dioxide & Inflammatory Bowel Disease": "simple",
+    "Apple Juice May Be Worse Than Sugar Water": "fuzzy",
+    "Prolonged Liver Function Enhancement From Broccoli": "fuzzy",
+    "Preventing Strokes with Diet": "fuzzy",
+    "Neurobiology of Artificial Sweeteners": "simple",
+    "Benefits of Fenugreek Seeds": "simple",
+    "More Antibiotics In White Meat or Dark Meat?": "complex",
+    "BPA Plastic and Male Sexual Dysfunction": "simple",
+    "Filled Full of Lead": "fuzzy",
+    "The Answer to the Pritikin Puzzle": "fuzzy",
+    "To Snack or Not to Snack?": "fuzzy",
+    "Boosting Good Bacteria in the Colon Without Probiotics": "fuzzy",
+    "Optimal Phytosterol Dose": "fuzzy",
+    "Human Neurotransmitters in Plants": "fuzzy",
+    "Dietary Treatment of Crohn's Disease": "simple",
+    "Unsafe at Any Feed": "fuzzy",
+    "Kiwifruit for Irritable Bowel Syndrome": "fuzzy",
+    "Pharmacists Versus Health Food Store Employees: Who Gives Better Advice?": "complex",
+    "Preventing Cataracts with Diet": "fuzzy",
+    "Cholesterol and Lower Back Pain": "fuzzy",
+    "Cheese Mites and Maggots": "fuzzy",
+    "EPIC Findings on Lymphoma": "fuzzy",
+    "Sometimes the Enzyme Myth Is True": "fuzzy",
+    "Vitamin C-Enriched Bacon": "fuzzy",
+    "Out of the Lab Onto the Track": "fuzzy",
+    "Dragon's Blood": "fuzzy",
+    "Better Than Goji Berries": "fuzzy",
+    "How to Help Prevent Abdominal Aortic Aneurysms": "simple",
+    "The Difficulty of Arriving at a Vitamin D Recommendation": "fuzzy",
+    "Amyloid and Apple Juice": "fuzzy",
+    "Dietary Guidelines: From Dairies to Berries": "fuzzy",
+    "Are Avocados Good for You?": "fuzzy",
+    "Relieving Yourself of Excess Estrogen": "fuzzy",
+    "Too Much Iodine Can Be as Bad as Too Little": "fuzzy",
+    "Is Milk and Mucus a Myth?": "simple",
+    "Convergence of Evidence": "fuzzy",
+    "Is Dragon Fruit Good For You?": "fuzzy",
+    "Is Distilled Fish Oil Toxin-Free?": "simple",
+    "Acne & Cancer Connection": "fuzzy",
+    "Overdosing on Greens": "fuzzy",
+    "Dietary Theory of Alzheimer's": "simple",
+    "Meat & Multiple Myeloma": "fuzzy",
+    "Apthous Ulcer Mystery Solved": "fuzzy",
+    "EPIC Study": "fuzzy",
+    "Update on Herbalife®": "fuzzy",
+    "Saturated Fat & Cancer Progression": "fuzzy",
+    "Aluminum in Vaccines vs. Food": "complex",
+    "Are Multivitamins Good For You?": "fuzzy",
+    "Fish Fog": "fuzzy",
+    "Sexually Transmitted Fish Toxin": "fuzzy",
+    "Veggies vs. Cancer": "fuzzy",
+    "Alcohol Risks vs. Benefits": "complex",
+    "Is Coconut Milk Good For You?": "fuzzy",
+    "Boosting Heart Nerve Control": "fuzzy",
+    "Kuna Indian Secret": "fuzzy",
+    "The Healthiest Sweetener": "fuzzy",
+    "Are Artificial Colors Bad for You?": "fuzzy",
+    "Antioxidant Content of 300 Foods": "simple",
+    "Healthiest Airplane Beverage": "fuzzy",
+    "Plant vs. Cow Calcium": "complex",
+    "Vitamin Supplements Worth Taking": "fuzzy",
+    "Healthy Chocolate Milkshakes": "fuzzy",
+    "The Healthiest Vegetables": "fuzzy",
+    "Bowel Movement Frequency": "simple",
+    "Olive Oil and Artery Function": "fuzzy",
+    "How Doctors Responded to Being Named a Leading Killer": "fuzzy"
   },
   "rewrite": {
     "Anthrax spores can be disposed of easily after they are dispersed.||3": [
@@ -380,6 +703,1061 @@
       "我最喜欢的音乐剧是哪一部",
       "有哪些广受欢迎的音乐剧值得推荐",
       "我最钟爱的音乐剧作品有哪些"
+    ],
+    "How to Reduce Exposure to Alkylphenols Through Your Diet||3": [
+      "How to Reduce Exposure to Alkylphenols Through Your Diet",
+      "How to minimize dietary exposure to alkylphenols",
+      "Dietary sources of alkylphenols and how to avoid them",
+      "Foods containing alkylphenols and strategies to reduce intake"
+    ],
+    "What’s Driving America’s Obesity Problem?||3": [
+      "What’s Driving America’s Obesity Problem?",
+      "What are the primary causes of rising obesity rates in the United States?",
+      "Key drivers and risk factors contributing to the obesity epidemic in America",
+      "Social, economic, and environmental factors behind increasing obesity prevalence in the U.S."
+    ],
+    "Do Cholesterol Statin Drugs Cause Breast Cancer?||3": [
+      "Do Cholesterol Statin Drugs Cause Breast Cancer?",
+      "Do statin medications increase the risk of developing breast cancer?",
+      "Is there a causal link between cholesterol-lowering statins and breast cancer incidence?",
+      "What does current medical research say about statins and breast cancer risk?"
+    ],
+    "Who Should be Careful About Curcumin?||3": [
+      "Who Should be Careful About Curcumin?",
+      "Who should avoid or use caution with curcumin supplementation?",
+      "Which populations or medical conditions contraindicate curcumin use?",
+      "What are the safety precautions and contraindications for curcumin?"
+    ],
+    "What Do Meat Purge and Cola Have in Common?||3": [
+      "What Do Meat Purge and Cola Have in Common?",
+      "What is the relationship between meat purge and cola in food science or culinary contexts?",
+      "How does cola interact with meat purge during marination or cooking processes?",
+      "Is there a chemical or functional similarity between meat purge and cola, such as acidity, enzyme activity, or tenderizing properties?"
+    ],
+    "Stopping Heart Disease in Childhood||3": [
+      "Stopping Heart Disease in Childhood",
+      "Preventing heart disease in children",
+      "Early intervention strategies for pediatric cardiovascular disease",
+      "Childhood risk factors and prevention of heart disease"
+    ],
+    "Food Dyes and ADHD||3": [
+      "Food Dyes and ADHD",
+      "Food dyes and attention-deficit/hyperactivity disorder in children",
+      "Artificial food colorings and ADHD symptoms in pediatric populations",
+      "Association between synthetic food dyes and hyperactivity or inattention in ADHD"
+    ],
+    "Chronic Headaches and Pork Parasites||3": [
+      "Chronic Headaches and Pork Parasites",
+      "Chronic headaches caused by pork tapeworm infection",
+      "Neurocysticercosis and chronic headache symptoms",
+      "Taenia solium infection leading to persistent headaches"
+    ],
+    "How Citrus Might Help Keep Your Hands Warm||3": [
+      "How Citrus Might Help Keep Your Hands Warm",
+      "How does citrus consumption affect peripheral circulation and hand warmth?",
+      "Can eating citrus fruits improve blood flow to extremities like hands?",
+      "Does vitamin C or bioflavonoids in citrus fruits help maintain warm hands in cold conditions?"
+    ],
+    "How Should I Take Probiotics?||3": [
+      "How Should I Take Probiotics?",
+      "How to take probiotic supplements correctly",
+      "Best practices for taking probiotics (timing, food, storage)",
+      "When and how to take probiotic capsules or powders for maximum effectiveness"
+    ],
+    "Diet and Cellulite||3": [
+      "Diet and Cellulite",
+      "Dietary interventions for cellulite reduction",
+      "Foods that help reduce cellulite appearance",
+      "Nutrition and lifestyle approaches to manage cellulite"
+    ],
+    "Best Treatment for Constipation||3": [
+      "Best Treatment for Constipation",
+      "Most effective treatments for chronic constipation in adults",
+      "Evidence-based medical and lifestyle interventions for constipation management",
+      "First-line and alternative therapies for functional constipation"
+    ],
+    "Should We Avoid Titanium Dioxide?||3": [
+      "Should We Avoid Titanium Dioxide?",
+      "Is titanium dioxide safe for human consumption?",
+      "Should titanium dioxide be banned from food and cosmetics?",
+      "What are the health risks of titanium dioxide exposure?"
+    ],
+    "Avoiding Cooked Meat Carcinogens||3": [
+      "Avoiding Cooked Meat Carcinogens",
+      "How to reduce carcinogens in cooked meat",
+      "Preventing formation of heterocyclic amines and polycyclic aromatic hydrocarbons in grilled or fried meat",
+      "Safe cooking methods to minimize cancer-causing compounds in meat"
+    ],
+    "How Chemically Contaminated Are We?||3": [
+      "How Chemically Contaminated Are We?",
+      "What are the current levels of chemical contamination in humans globally?",
+      "How widespread is human exposure to industrial chemicals, pesticides, and heavy metals?",
+      "What biomonitoring data exist on chemical pollutants (e.g., PFAS, PCBs, lead, pesticides) in human blood and urine?"
+    ],
+    "Treating an Enlarged Prostate With Diet||3": [
+      "Treating an Enlarged Prostate With Diet",
+      "Dietary approaches for managing benign prostatic hyperplasia (BPH)",
+      "Foods and nutrition to reduce symptoms of enlarged prostate",
+      "Evidence-based dietary interventions for benign prostatic hyperplasia"
+    ],
+    "Vitamin D: Shedding some light on the new recommendations||3": [
+      "Vitamin D: Shedding some light on the new recommendations",
+      "Vitamin D updated clinical guidelines 2023–2024",
+      "Vitamin D recommended daily intake new evidence consensus",
+      "Vitamin D supplementation guidelines revision recent update"
+    ],
+    "Stool Size and Breast Cancer Risk||3": [
+      "Stool Size and Breast Cancer Risk",
+      "Stool size measurement and breast cancer risk association",
+      "Bowel movement characteristics and breast cancer incidence",
+      "Fecal volume or consistency and risk of developing breast cancer"
+    ],
+    "Breast Cancer and Diet||3": [
+      "Breast Cancer and Diet",
+      "breast cancer risk factors diet association",
+      "dietary patterns and breast cancer incidence epidemiology",
+      "nutrition interventions for breast cancer prevention"
+    ],
+    "Any update on the scary in vitro avocado data?||3": [
+      "Any update on the scary in vitro avocado data?",
+      "Latest research findings on in vitro avocado toxicity studies",
+      "Recent peer-reviewed publications on avocado cytotoxicity in cell culture models",
+      "New evidence on avocado extract effects on human cells in vitro"
+    ],
+    "Didn't another study show carnitine was good for the heart?||3": [
+      "Didn't another study show carnitine was good for the heart?",
+      "Was there a clinical study demonstrating L-carnitine's cardiovascular benefits?",
+      "What evidence exists from peer-reviewed research on carnitine supplementation and heart health?",
+      "Have randomized controlled trials found L-carnitine effective for improving cardiac function or reducing heart disease risk?"
+    ],
+    "What do you think of Dr. Jenkins' take on paleolithic diets?||3": [
+      "What do you think of Dr. Jenkins' take on paleolithic diets?",
+      "Dr. Jenkins' critique or analysis of the Paleolithic diet",
+      "Dr. Jenkins' published opinions or research on paleo diet effectiveness and validity",
+      "Dr. Jenkins' scholarly commentary on Paleolithic nutrition science"
+    ],
+    "What about pepper plus turmeric in V8 juice?||3": [
+      "What about pepper plus turmeric in V8 juice?",
+      "Can adding black pepper and turmeric to V8 vegetable juice enhance curcumin absorption?",
+      "Does combining turmeric, black pepper, and V8 juice improve bioavailability of curcumin?",
+      "What is the effect of adding turmeric and black pepper to V8 juice on nutrient absorption?"
+    ],
+    "Is apple cider vinegar good for you?||3": [
+      "Is apple cider vinegar good for you?",
+      "Health benefits of apple cider vinegar",
+      "Scientific evidence for apple cider vinegar health effects",
+      "Is apple cider vinegar beneficial for human health?"
+    ],
+    "How can you believe in any scientific study?||3": [
+      "How can you believe in any scientific study?",
+      "How can I critically evaluate the credibility of scientific studies?",
+      "What are reliable methods for assessing the validity and trustworthiness of scientific research?",
+      "How do scientists and experts determine whether a scientific study is credible and trustworthy?"
+    ],
+    "accidents||3": [
+      "accidents",
+      "traffic accidents statistics",
+      "industrial accidents prevention",
+      "workplace accident reporting requirements"
+    ],
+    "African-American||3": [
+      "African-American",
+      "African American people",
+      "Black Americans",
+      "African-American population"
+    ],
+    "airport scanners||3": [
+      "airport scanners",
+      "airport security scanners types and technology",
+      "how do airport baggage and body scanners work",
+      "airport screening equipment used by TSA and international airports"
+    ],
+    "alternative medicine||3": [
+      "alternative medicine",
+      "complementary and alternative medicine (CAM)",
+      "integrative medicine practices",
+      "non-conventional or holistic health therapies"
+    ],
+    "Alli||3": [
+      "Alli",
+      "Alli weight loss drug side effects",
+      "Orlistat brand name Alli adverse reactions",
+      "Alli (orlistat) over-the-counter weight loss medication safety profile"
+    ],
+    "apnea||3": [
+      "apnea",
+      "sleep apnea",
+      "obstructive sleep apnea",
+      "apnea diagnosis and treatment"
+    ],
+    "Arkansas||3": [
+      "Arkansas",
+      "Arkansas state government official website",
+      "Arkansas tourism official travel guide",
+      "Arkansas Department of Education public resources"
+    ],
+    "avocados||3": [
+      "avocados",
+      "avocado nutrition facts and health benefits",
+      "avocado cultivation methods and growing conditions",
+      "avocado recipes for healthy meals"
+    ],
+    "beans||3": [
+      "beans",
+      "types of edible beans used in cooking",
+      "common bean varieties and their culinary uses",
+      "nutritional benefits and health effects of beans"
+    ],
+    "bagels||3": [
+      "bagels",
+      "bagel recipes and baking instructions",
+      "types of bagels and their ingredients",
+      "how to make bagels at home step by step"
+    ],
+    "blood clots||3": [
+      "blood clots",
+      "blood clot symptoms and warning signs",
+      "deep vein thrombosis (DVT) and pulmonary embolism (PE) diagnosis",
+      "causes and risk factors for abnormal blood clot formation"
+    ],
+    "BMAA||3": [
+      "BMAA",
+      "BMAA neurotoxin detection methods",
+      "beta-methylamino-L-alanine analytical testing protocols",
+      "BMAA cyanobacterial toxin quantification techniques"
+    ],
+    "bone fractures||3": [
+      "bone fractures",
+      "bone fracture types and classification systems",
+      "common causes and risk factors for bone fractures",
+      "diagnosis and treatment of bone fractures"
+    ],
+    "BPH||3": [
+      "BPH",
+      "benign prostatic hyperplasia",
+      "enlarged prostate",
+      "BPH symptoms treatment diagnosis"
+    ],
+    "breast pain||3": [
+      "breast pain",
+      "breast pain symptoms and causes",
+      "mastalgia diagnosis and treatment",
+      "causes of cyclical and non-cyclical breast pain"
+    ],
+    "Bush administration||3": [
+      "Bush administration",
+      "George W. Bush administration policies",
+      "Bush administration 2001–2009 key initiatives",
+      "U.S. federal government under President George W. Bush"
+    ],
+    "Chernobyl||3": [
+      "Chernobyl",
+      "Chernobyl nuclear disaster 1986",
+      "Chernobyl accident causes and consequences",
+      "Chernobyl power plant explosion details"
+    ],
+    "cinnamon||3": [
+      "cinnamon",
+      "cinnamon spice uses and health benefits",
+      "cassia vs ceylon cinnamon differences and identification",
+      "cinnamon essential oil applications and safety guidelines"
+    ],
+    "coffee||3": [
+      "coffee",
+      "coffee brewing methods",
+      "types of coffee beans and their flavor profiles",
+      "how to make coffee at home with different equipment"
+    ],
+    "coma||3": [
+      "coma",
+      "coma medical condition definition and causes",
+      "coma symptoms diagnosis and treatment guidelines",
+      "what is coma in neurology and how is it assessed"
+    ],
+    "cooking methods||3": [
+      "cooking methods",
+      "cooking techniques and methods",
+      "food preparation methods",
+      "culinary cooking methods"
+    ],
+    "crib death||3": [
+      "crib death",
+      "SIDS sudden infant death syndrome",
+      "sudden infant death syndrome causes and prevention",
+      "crib death medical term SIDS"
+    ],
+    "DHA||3": [
+      "DHA",
+      "DHA supplement benefits for brain health",
+      "docosahexaenoic acid cognitive function research",
+      "DHA omega-3 fatty acid neurological development studies"
+    ],
+    "dietary scoring||3": [
+      "dietary scoring",
+      "dietary quality scoring systems",
+      "nutritional diet scoring methods",
+      "healthy eating index and dietary assessment tools"
+    ],
+    "energy drinks||3": [
+      "energy drinks",
+      "energy drink brands and ingredients",
+      "health effects of energy drinks consumption",
+      "popular energy drinks market share and sales data"
+    ],
+    "factory farming practices||3": [
+      "factory farming practices",
+      "industrial livestock farming methods",
+      "large-scale commercial animal agriculture practices",
+      "concentrated animal feeding operation (CAFO) practices"
+    ],
+    "Finland||3": [
+      "Finland",
+      "Finland country profile",
+      "Finland geography and demographics",
+      "Finland facts and statistics"
+    ],
+    "genetic manipulation||3": [
+      "genetic manipulation",
+      "genetic engineering techniques",
+      "CRISPR and gene editing methods",
+      "DNA modification technologies"
+    ],
+    "grapes||3": [
+      "grapes",
+      "grapes fruit nutrition facts",
+      "grapes cultivation methods and growing conditions",
+      "grapes health benefits and antioxidant content"
+    ],
+    "growth promoters||3": [
+      "growth promoters",
+      "animal growth promoters",
+      "feed additives for growth promotion in livestock",
+      "growth-promoting agents in animal agriculture"
+    ],
+    "hearing||3": [
+      "hearing",
+      "hearing loss symptoms and causes",
+      "types of hearing impairment and diagnosis methods",
+      "auditory system function and hearing disorders"
+    ],
+    "Hiroshima||3": [
+      "Hiroshima",
+      "Hiroshima atomic bombing 1945",
+      "Hiroshima nuclear attack history",
+      "Hiroshima bombing World War II"
+    ],
+    "hyperactivity||3": [
+      "hyperactivity",
+      "ADHD hyperactivity symptoms in children",
+      "hyperactivity disorder diagnosis criteria",
+      "excessive motor activity and impulsivity in ADHD"
+    ],
+    "industrial toxins||3": [
+      "industrial toxins",
+      "industrial chemical toxins",
+      "toxic substances released by manufacturing industries",
+      "hazardous industrial pollutants"
+    ],
+    "insects||3": [
+      "insects",
+      "list of insect species with scientific names",
+      "common insects found in North America",
+      "insect taxonomy and classification system"
+    ],
+    "Japan||3": [
+      "Japan",
+      "Japan country information",
+      "Japan facts and statistics",
+      "Japan overview and background"
+    ],
+    "junk food||3": [
+      "junk food",
+      "ultra-processed foods health effects",
+      "high-calorie low-nutrient foods and chronic disease risk",
+      "unhealthy snack foods and dietary guidelines"
+    ],
+    "lard||3": [
+      "lard",
+      "lard nutrition facts and health effects",
+      "lard cooking properties and culinary uses",
+      "lard production process and traditional rendering methods"
+    ],
+    "leeks||3": [
+      "leeks",
+      "leeks vegetable nutritional information",
+      "leeks cooking methods and recipes",
+      "leeks health benefits and uses"
+    ],
+    "liver disease||3": [
+      "liver disease",
+      "liver disease causes and risk factors",
+      "types of liver disease and their symptoms",
+      "liver disease diagnosis and treatment options"
+    ],
+    "low-carb diets||3": [
+      "low-carb diets",
+      "low-carbohydrate diet effectiveness for weight loss",
+      "low-carb diets such as ketogenic and Atkins: health benefits and risks",
+      "scientific evidence on low-carbohydrate dietary patterns for metabolic health"
+    ],
+    "medical ethics||3": [
+      "medical ethics",
+      "medical ethics principles and guidelines",
+      "bioethics and clinical decision-making frameworks",
+      "healthcare professional ethical standards and codes of conduct"
+    ],
+    "memory||3": [
+      "memory",
+      "computer memory types and specifications",
+      "RAM and storage memory differences in computing",
+      "memory hardware components in computers"
+    ],
+    "mesquite||3": [
+      "mesquite",
+      "mesquite tree species characteristics and habitat",
+      "Prosopis glandulosa (mesquite) botanical information and distribution",
+      "mesquite plant ecology invasive status and uses"
+    ],
+    "milk||3": [
+      "milk",
+      "milk nutritional content and health benefits",
+      "types of milk including cow, soy, almond, and oat milk",
+      "milk production process from dairy farming to packaging"
+    ],
+    "muscle health||3": [
+      "muscle health",
+      "muscle health maintenance and improvement strategies",
+      "factors affecting skeletal muscle health in adults",
+      "evidence-based interventions for preserving muscle mass and function"
+    ],
+    "Native Americans||3": [
+      "Native Americans",
+      "Indigenous peoples of the United States",
+      "American Indian and Alaska Native populations",
+      "Native American history, culture, and contemporary issues"
+    ],
+    "NIH-AARP study||3": [
+      "NIH-AARP study",
+      "NIH-AARP Diet and Health Study",
+      "NIH-AARP cohort study cancer risk",
+      "NIH-AARP prospective cohort study diet and chronic disease"
+    ],
+    "okra||3": [
+      "okra",
+      "okra vegetable nutrition facts and health benefits",
+      "okra plant cultivation guide for home gardeners",
+      "okra recipes for cooking and preparation methods"
+    ],
+    "nuts||3": [
+      "nuts",
+      "types of edible nuts and their nutritional benefits",
+      "list of common tree nuts and groundnuts with botanical classification",
+      "health effects and dietary uses of nuts including almonds, walnuts, and cashews"
+    ],
+    "oxen meat||3": [
+      "oxen meat",
+      "oxen meat consumption history",
+      "oxen meat nutritional value and culinary uses",
+      "oxen meat vs beef differences and characteristics"
+    ],
+    "Panama||3": [
+      "Panama",
+      "Panama country information",
+      "Republic of Panama facts and statistics",
+      "Panama geography, history, and economy"
+    ],
+    "peanut butter||3": [
+      "peanut butter",
+      "peanut butter nutrition facts and health benefits",
+      "how to make homemade peanut butter from roasted peanuts",
+      "types of peanut butter (creamy, crunchy, natural, organic) comparison"
+    ],
+    "Peoria||3": [
+      "Peoria",
+      "Peoria Illinois city information",
+      "Peoria Arizona population and demographics",
+      "Peoria Illinois official government website"
+    ],
+    "pesticides||3": [
+      "pesticides",
+      "pesticide types and classification",
+      "common agricultural pesticides and their uses",
+      "chemical pesticides environmental impact and regulation"
+    ],
+    "philippines||3": [
+      "philippines",
+      "Philippines country information",
+      "Philippines geography and demographics",
+      "Philippines facts and statistics"
+    ],
+    "pineapples||3": [
+      "pineapples",
+      "pineapple fruit nutrition facts and health benefits",
+      "how to grow pineapple plants at home or in tropical climates",
+      "pineapple cultivation methods and commercial production statistics"
+    ],
+    "plant-based diet||3": [
+      "plant-based diet",
+      "plant-based diet benefits and health effects",
+      "vegan diet vs plant-based diet differences",
+      "scientific evidence for plant-based diet effectiveness"
+    ],
+    "poisonous plants||3": [
+      "poisonous plants",
+      "toxic plants dangerous to humans",
+      "poisonous plants common in North America",
+      "plants containing deadly toxins or alkaloids"
+    ],
+    "pork||3": [
+      "pork",
+      "pork meat nutrition facts",
+      "pork cooking methods and recipes",
+      "pork production and farming practices"
+    ],
+    "poultry workers||3": [
+      "poultry workers",
+      "poultry processing plant workers",
+      "poultry industry laborers",
+      "chicken and turkey slaughterhouse workers"
+    ],
+    "prunes||3": [
+      "prunes",
+      "prune tree branches for health and safety",
+      "how to properly prune shrubs and trees",
+      "best practices for pruning fruit trees and ornamental plants"
+    ],
+    "pumpkin||3": [
+      "pumpkin",
+      "pumpkin vegetable nutrition facts",
+      "pumpkin plant cultivation guide",
+      "pumpkin recipe ideas for cooking"
+    ],
+    "red tea||3": [
+      "red tea",
+      "black tea",
+      "oxidized tea",
+      "fermented tea"
+    ],
+    "salmon||3": [
+      "salmon",
+      "Atlantic salmon aquaculture environmental impact",
+      "Pacific salmon wild population decline causes",
+      "Salmon nutrition facts and health benefits"
+    ],
+    "seafood||3": [
+      "seafood",
+      "seafood restaurants near me",
+      "best seafood dishes and recipes",
+      "types of seafood and nutritional benefits"
+    ],
+    "shelf life||3": [
+      "shelf life",
+      "shelf life of food products",
+      "product shelf life expiration date definition",
+      "how to determine shelf life of packaged goods"
+    ],
+    "smoking||3": [
+      "smoking",
+      "tobacco smoking health effects",
+      "cigarette smoking risks and consequences",
+      "smoking addiction causes and treatment"
+    ],
+    "soil health||3": [
+      "soil health",
+      "soil health indicators and assessment methods",
+      "soil health metrics soil quality parameters",
+      "soil health evaluation soil testing best practices"
+    ],
+    "subsidies||3": [
+      "subsidies",
+      "government subsidies for renewable energy projects",
+      "financial incentives and subsidies for clean energy adoption",
+      "subsidy programs for solar panel installation and wind power development"
+    ],
+    "sulfur||3": [
+      "sulfur",
+      "sulfur element properties and uses",
+      "sulfur chemical element atomic number 16",
+      "sulfur facts periodic table information"
+    ],
+    "suppositories||3": [
+      "suppositories",
+      "rectal suppositories for medication delivery",
+      "vaginal suppositories for treatment of infections",
+      "pharmaceutical suppositories formulation and administration"
+    ],
+    "sweeteners||3": [
+      "sweeteners",
+      "artificial sweeteners used in food and beverages",
+      "natural and artificial sweeteners comparison",
+      "common sweeteners approved by FDA and EFSA"
+    ],
+    "taro||3": [
+      "taro",
+      "Taro 框架官方文档",
+      "Taro 多端开发框架 GitHub 仓库",
+      "Taro React 跨平台小程序开发工具"
+    ],
+    "Tufts||3": [
+      "Tufts",
+      "Tufts University official website",
+      "Tufts University academic programs and admissions",
+      "Tufts University location campus map"
+    ],
+    "turnips||3": [
+      "turnips",
+      "turnip vegetable nutritional information",
+      "turnip root vegetable growing conditions and care",
+      "turnip recipes and cooking methods"
+    ],
+    "uterine health||3": [
+      "uterine health",
+      "uterine health symptoms and warning signs",
+      "uterine health maintenance and prevention strategies",
+      "common uterine disorders and their impact on reproductive health"
+    ],
+    "veal||3": [
+      "veal",
+      "veal meat nutrition facts",
+      "calf meat health benefits and dietary information",
+      "veal cuts cooking methods and nutritional profile"
+    ],
+    "veggie chicken||3": [
+      "veggie chicken",
+      "vegetable-based chicken substitute",
+      "plant-based chicken alternative",
+      "vegan chicken product"
+    ],
+    "weight gain||3": [
+      "weight gain",
+      "causes of unintentional weight gain",
+      "factors contributing to rapid weight gain",
+      "medical conditions associated with weight gain"
+    ],
+    "whiting||3": [
+      "whiting",
+      "whiting fish species scientific name",
+      "whiting fish common names and taxonomy",
+      "whiting marine fish identification guide"
+    ],
+    "worms||3": [
+      "worms",
+      "earthworms biology and ecology",
+      "annelid worms classification and characteristics",
+      "parasitic worms in humans medical information"
+    ],
+    "Yale||3": [
+      "Yale",
+      "Yale University official website",
+      "Yale University admissions requirements",
+      "Yale University history and founding date"
+    ],
+    "Preventing Brain Loss with B Vitamins?||3": [
+      "Preventing Brain Loss with B Vitamins?",
+      "Can B vitamins prevent age-related brain atrophy or cognitive decline?",
+      "Do B12, B6, and folate supplementation reduce risk of dementia or memory loss in older adults?",
+      "What is the evidence for B-complex vitamins in preventing neurodegeneration or brain volume loss?"
+    ],
+    "More Than an Apple a Day: Combating Common Diseases||3": [
+      "More Than an Apple a Day: Combating Common Diseases",
+      "\"More Than an Apple a Day: Combating Common Diseases\" book summary",
+      "\"More Than an Apple a Day: Combating Common Diseases\" health science book author and publication details",
+      "\"More Than an Apple a Day: Combating Common Diseases\" evidence-based prevention strategies for common illnesses"
+    ],
+    "Are Organic Foods Safer?||3": [
+      "Are Organic Foods Safer?",
+      "Are organic foods safer than conventionally grown foods in terms of pesticide residues and foodborne pathogens?",
+      "Do organic food products have lower levels of synthetic pesticides, heavy metals, or microbial contamination compared to non-organic foods?",
+      "What does scientific evidence say about the safety advantages of organic foods over conventional foods?"
+    ],
+    "Is Milk Good for Our Bones?||3": [
+      "Is Milk Good for Our Bones?",
+      "Does drinking milk improve bone health or prevent osteoporosis?",
+      "What is the scientific evidence linking milk consumption to bone mineral density?",
+      "How does calcium and vitamin D in milk affect skeletal health in adults and children?"
+    ],
+    "Preventing Ulcerative Colitis with Diet||3": [
+      "Preventing Ulcerative Colitis with Diet",
+      "Dietary strategies to prevent ulcerative colitis onset",
+      "Can specific diets reduce the risk of developing ulcerative colitis?",
+      "Role of nutrition and dietary patterns in ulcerative colitis prevention"
+    ],
+    "The Saturated Fat Studies: Buttering Up the Public||3": [
+      "The Saturated Fat Studies: Buttering Up the Public",
+      "Saturated fat health effects scientific studies butter public perception",
+      "\"butter and saturated fat\" public health controversy research evidence",
+      "Saturated fat dietary guidelines butter industry influence on nutrition science"
+    ],
+    "Coffee and Artery Function||3": [
+      "Coffee and Artery Function",
+      "coffee consumption and arterial function",
+      "caffeine intake and endothelial function",
+      "effects of coffee on blood vessel health"
+    ],
+    "Does Cholesterol Size Matter?||3": [
+      "Does Cholesterol Size Matter?",
+      "Does cholesterol particle size affect cardiovascular disease risk?",
+      "Is small dense LDL cholesterol more atherogenic than large buoyant LDL?",
+      "How does HDL and LDL particle size influence heart disease risk?"
+    ],
+    "Diabetics Should Take Their Pulses||3": [
+      "Diabetics Should Take Their Pulses",
+      "Should people with diabetes monitor their pulse regularly?",
+      "Is pulse monitoring recommended for individuals with diabetes?",
+      "Do diabetic patients need to check their heart rate or pulse routinely?"
+    ],
+    "Alkylphenol Endocrine Disruptors and Allergies||3": [
+      "Alkylphenol Endocrine Disruptors and Allergies",
+      "Alkylphenol endocrine disruptors association with allergic diseases",
+      "Alkylphenols as endocrine-disrupting chemicals and their link to allergy development",
+      "Health effects of alkylphenol exposure on immune sensitization and allergic responses"
+    ],
+    "Chicken Salmonella Thanks to Meat Industry Lawsuit||3": [
+      "Chicken Salmonella Thanks to Meat Industry Lawsuit",
+      "Chicken Salmonella outbreak lawsuit against meat industry",
+      "Lawsuit alleging meat industry responsibility for Salmonella in chicken",
+      "Chicken Salmonella contamination legal case against poultry companies"
+    ],
+    "How Long to Detox From Fish Before Pregnancy?||3": [
+      "How Long to Detox From Fish Before Pregnancy?",
+      "How long should women avoid fish before trying to get pregnant to reduce mercury exposure?",
+      "What is the recommended waiting period after eating fish high in mercury before conception?",
+      "How long does it take for mercury from fish to clear from the body before pregnancy planning?"
+    ],
+    "Counteracting the Effects of Dioxins Through Diet||3": [
+      "Counteracting the Effects of Dioxins Through Diet",
+      "Dietary strategies to reduce dioxin toxicity in humans",
+      "Foods and nutrients that mitigate dioxin exposure health effects",
+      "How diet can counteract dioxin-induced oxidative stress and endocrine disruption"
+    ],
+    "Chronic Headaches and Pork Tapeworms||3": [
+      "Chronic Headaches and Pork Tapeworms",
+      "Chronic headaches associated with Taenia solium infection",
+      "Neurocysticercosis and chronic headache symptoms",
+      "Long-term headaches caused by pork tapeworm (Taenia solium) neurocysticercosis"
+    ],
+    "Keeping Your Hands Warm With Citrus||3": [
+      "Keeping Your Hands Warm With Citrus",
+      "how to keep hands warm using citrus fruits",
+      "citrus-based hand warming remedies or techniques",
+      "does citrus help warm cold hands – scientific explanation"
+    ],
+    "Preventing the Common Cold with Probiotics?||3": [
+      "Preventing the Common Cold with Probiotics?",
+      "Can probiotics prevent the common cold in adults?",
+      "Do probiotic supplements reduce incidence or severity of common cold infections?",
+      "Evidence for probiotics in preventing upper respiratory tract infections like the common cold"
+    ],
+    "Eating Healthy on a Budget||3": [
+      "Eating Healthy on a Budget",
+      "affordable healthy eating tips",
+      "low-cost nutritious meal planning",
+      "budget-friendly healthy food recipes"
+    ],
+    "Do Fruit & Nut Bars Cause Weight Gain?||3": [
+      "Do Fruit & Nut Bars Cause Weight Gain?",
+      "Do fruit and nut bars contribute to weight gain?",
+      "Can eating fruit and nut bars lead to weight gain?",
+      "Are fruit and nut bars associated with weight gain or increased body weight?"
+    ],
+    "Apple Juice May Be Worse Than Sugar Water||3": [
+      "Apple Juice May Be Worse Than Sugar Water",
+      "Is apple juice nutritionally equivalent to sugar water",
+      "Does apple juice have similar health effects as sugar-sweetened beverages",
+      "Is commercially available apple juice as unhealthy as added sugar drinks"
+    ],
+    "Prolonged Liver Function Enhancement From Broccoli||3": [
+      "Prolonged Liver Function Enhancement From Broccoli",
+      "Long-term improvement in liver function from broccoli consumption",
+      "Broccoli supplementation and sustained enhancement of hepatic function",
+      "Does regular broccoli intake lead to prolonged liver enzyme normalization or functional improvement"
+    ],
+    "Preventing Strokes with Diet||3": [
+      "Preventing Strokes with Diet",
+      "Dietary strategies to prevent ischemic and hemorrhagic stroke",
+      "Foods and nutrients that reduce stroke risk in adults",
+      "Evidence-based dietary guidelines for primary stroke prevention"
+    ],
+    "Filled Full of Lead||3": [
+      "Filled Full of Lead",
+      "\"Filled Full of Lead\" song lyrics",
+      "\"Filled Full of Lead\" by The Black Keys lyrics",
+      "\"Filled Full of Lead\" album track lyrics"
+    ],
+    "The Answer to the Pritikin Puzzle||3": [
+      "The Answer to the Pritikin Puzzle",
+      "What is the solution to the Pritikin Puzzle?",
+      "How do you solve the Pritikin Puzzle?",
+      "What does the Pritikin Puzzle refer to and what is its answer?"
+    ],
+    "To Snack or Not to Snack?||3": [
+      "To Snack or Not to Snack?",
+      "Is snacking beneficial or harmful to health?",
+      "What are the pros and cons of eating snacks between meals?",
+      "Does regular snacking support or undermine weight management and metabolic health?"
+    ],
+    "Boosting Good Bacteria in the Colon Without Probiotics||3": [
+      "Boosting Good Bacteria in the Colon Without Probiotics",
+      "How to increase beneficial gut bacteria naturally without probiotic supplements",
+      "Ways to support healthy colon microbiota without taking probiotics",
+      "Natural methods to enhance good bacteria in the large intestine excluding probiotic products"
+    ],
+    "Optimal Phytosterol Dose||3": [
+      "Optimal Phytosterol Dose",
+      "optimal daily dose of phytosterols for cholesterol reduction",
+      "recommended phytosterol dosage in clinical guidelines",
+      "evidence-based phytosterol intake for cardiovascular health"
+    ],
+    "Human Neurotransmitters in Plants||3": [
+      "Human Neurotransmitters in Plants",
+      "Do plants produce human neurotransmitters such as serotonin, dopamine, or acetylcholine?",
+      "Are there plant-derived compounds that act as human neurotransmitters or neuromodulators?",
+      "Can plants synthesize biologically active neurotransmitters found in the human nervous system?"
+    ],
+    "Unsafe at Any Feed||3": [
+      "Unsafe at Any Feed",
+      "\"Unsafe at Any Feed\" book food safety history",
+      "\"Unsafe at Any Feed\" by David A. Kessler food regulation",
+      "\"Unsafe at Any Feed\" FDA oversight livestock feed contamination"
+    ],
+    "Kiwifruit for Irritable Bowel Syndrome||3": [
+      "Kiwifruit for Irritable Bowel Syndrome",
+      "Kiwifruit consumption and irritable bowel syndrome (IBS) symptoms",
+      "Effect of kiwifruit on IBS management and gastrointestinal health",
+      "Clinical evidence on kiwifruit for treating or alleviating irritable bowel syndrome"
+    ],
+    "Preventing Cataracts with Diet||3": [
+      "Preventing Cataracts with Diet",
+      "Dietary strategies to reduce risk of age-related cataracts",
+      "Foods and nutrients associated with lower cataract incidence",
+      "Can nutrition and antioxidants prevent cataract formation"
+    ],
+    "Cholesterol and Lower Back Pain||3": [
+      "Cholesterol and Lower Back Pain",
+      "Cholesterol levels and association with lower back pain",
+      "Hypercholesterolemia and risk of chronic low back pain",
+      "Dyslipidemia and lumbar spine pain prevalence"
+    ],
+    "Cheese Mites and Maggots||3": [
+      "Cheese Mites and Maggots",
+      "Cheese mite infestation in aged cheese",
+      "Cheese maggot contamination in dairy products",
+      "Mites and fly larvae in fermented or ripened cheese"
+    ],
+    "EPIC Findings on Lymphoma||3": [
+      "EPIC Findings on Lymphoma",
+      "EPIC system lymphoma clinical findings",
+      "EPIC EHR lymphoma diagnosis documentation",
+      "Lymphoma-related findings in EPIC electronic health record"
+    ],
+    "Sometimes the Enzyme Myth Is True||3": [
+      "Sometimes the Enzyme Myth Is True",
+      "\"The Enzyme Myth Is True\" article or essay by author",
+      "Critique of \"the enzyme myth\" in nutrition science",
+      "Debunking or validation of the enzyme myth in digestive health"
+    ],
+    "Vitamin C-Enriched Bacon||3": [
+      "Vitamin C-Enriched Bacon",
+      "vitamin C fortified bacon",
+      "ascorbic acid enriched bacon",
+      "bacon with added vitamin C"
+    ],
+    "Out of the Lab Onto the Track||3": [
+      "Out of the Lab Onto the Track",
+      "\"Out of the Lab Onto the Track\" sports technology commercialization",
+      "\"Out of the Lab Onto the Track\" athletic performance innovation translation",
+      "\"Out of the Lab Onto the Track\" research-to-athletics application"
+    ],
+    "Dragon's Blood||3": [
+      "Dragon's Blood",
+      "Dragon's Blood resin botanical source",
+      "Dragon's Blood plant species scientific names",
+      "Dragon's Blood tree or shrub identification"
+    ],
+    "Better Than Goji Berries||3": [
+      "Better Than Goji Berries",
+      "superfoods more nutritious than goji berries",
+      "health benefits of goji berries alternatives",
+      "nutrient-dense superfoods that outperform goji berries"
+    ],
+    "The Difficulty of Arriving at a Vitamin D Recommendation||3": [
+      "The Difficulty of Arriving at a Vitamin D Recommendation",
+      "Challenges in establishing evidence-based vitamin D intake guidelines",
+      "Why is it difficult to set universal vitamin D dietary reference intakes?",
+      "Scientific uncertainties and controversies in determining optimal vitamin D levels and recommendations"
+    ],
+    "Amyloid and Apple Juice||3": [
+      "Amyloid and Apple Juice",
+      "Amyloid protein and apple juice interaction",
+      "Amyloid-beta aggregation and apple juice polyphenols",
+      "Effect of apple juice on amyloid plaque formation"
+    ],
+    "Dietary Guidelines: From Dairies to Berries||3": [
+      "Dietary Guidelines: From Dairies to Berries",
+      "Dietary Guidelines for dairy products and berries",
+      "US Dietary Guidelines recommendations for dairy and fruit consumption",
+      "Nutrition guidelines on dairy intake and berry consumption"
+    ],
+    "Are Avocados Good for You?||3": [
+      "Are Avocados Good for You?",
+      "Health benefits of avocados for humans",
+      "Nutritional value and health effects of eating avocados",
+      "Is avocado consumption beneficial for human health?"
+    ],
+    "Relieving Yourself of Excess Estrogen||3": [
+      "Relieving Yourself of Excess Estrogen",
+      "How to reduce excess estrogen levels naturally",
+      "Methods to lower high estrogen in the body",
+      "Ways to balance or decrease elevated estrogen levels"
+    ],
+    "Too Much Iodine Can Be as Bad as Too Little||3": [
+      "Too Much Iodine Can Be as Bad as Too Little",
+      "Risks of excessive iodine intake compared to iodine deficiency",
+      "Health effects of high iodine levels versus low iodine levels",
+      "Iodine toxicity and deficiency: comparative health impacts"
+    ],
+    "Convergence of Evidence||3": [
+      "Convergence of Evidence",
+      "convergence of evidence in scientific reasoning",
+      "evidence convergence in interdisciplinary research",
+      "how multiple lines of evidence support a scientific conclusion"
+    ],
+    "Is Dragon Fruit Good For You?||3": [
+      "Is Dragon Fruit Good For You?",
+      "Health benefits of dragon fruit nutrition facts",
+      "Is pitaya (dragon fruit) nutritious and good for health?",
+      "Nutritional value and health effects of dragon fruit"
+    ],
+    "Acne & Cancer Connection||3": [
+      "Acne & Cancer Connection",
+      "Is there a scientific link between acne and cancer risk?",
+      "Does having acne increase the likelihood of developing cancer?",
+      "What is the relationship between acne vulgaris and cancer incidence?"
+    ],
+    "Overdosing on Greens||3": [
+      "Overdosing on Greens",
+      "Overdosing on green vegetables health risks",
+      "Excessive consumption of leafy greens side effects",
+      "Toxicity from eating too many greens like spinach or kale"
+    ],
+    "Meat & Multiple Myeloma||3": [
+      "Meat & Multiple Myeloma",
+      "meat consumption and multiple myeloma risk",
+      "red meat intake association with multiple myeloma incidence",
+      "dietary meat exposure and multiple myeloma epidemiology"
+    ],
+    "Apthous Ulcer Mystery Solved||3": [
+      "Apthous Ulcer Mystery Solved",
+      "What causes aphthous ulcers (canker sores)?",
+      "Recent scientific breakthroughs in understanding the pathogenesis of recurrent aphthous stomatitis",
+      "What is the current medical consensus on the underlying mechanism of aphthous ulcers?"
+    ],
+    "EPIC Study||3": [
+      "EPIC Study",
+      "EPIC study cancer epidemiology cohort",
+      "European Prospective Investigation into Cancer and Nutrition study",
+      "EPIC cohort study nutrition and chronic disease risk"
+    ],
+    "Update on Herbalife®||3": [
+      "Update on Herbalife®",
+      "Herbalife company latest news and updates",
+      "Herbalife recent developments and corporate announcements",
+      "Herbalife current status including financial performance and regulatory updates"
+    ],
+    "Saturated Fat & Cancer Progression||3": [
+      "Saturated Fat & Cancer Progression",
+      "saturated fat intake and cancer progression risk",
+      "dietary saturated fatty acids and tumor growth or metastasis",
+      "high-saturated-fat diet association with cancer development and advancement"
+    ],
+    "Are Multivitamins Good For You?||3": [
+      "Are Multivitamins Good For You?",
+      "Are multivitamins beneficial for general health in adults?",
+      "Do daily multivitamin supplements improve health outcomes or prevent disease?",
+      "What does scientific evidence say about the effectiveness and safety of multivitamins?"
+    ],
+    "Fish Fog||3": [
+      "Fish Fog",
+      "fish fog phenomenon",
+      "marine fog affecting fisheries",
+      "fog conditions in fishing areas"
+    ],
+    "Sexually Transmitted Fish Toxin||3": [
+      "Sexually Transmitted Fish Toxin",
+      "STI caused by fish toxin",
+      "fish-derived toxin transmitted through sexual contact"
+    ],
+    "Veggies vs. Cancer||3": [
+      "Veggies vs. Cancer",
+      "vegetables and cancer prevention",
+      "role of vegetables in reducing cancer risk",
+      "anti-cancer properties of vegetables"
+    ],
+    "Is Coconut Milk Good For You?||3": [
+      "Is Coconut Milk Good For You?",
+      "Health benefits and nutritional value of coconut milk",
+      "Is coconut milk healthy? Evidence-based analysis of its nutrients and risks",
+      "Coconut milk nutrition facts, pros and cons for human health"
+    ],
+    "Boosting Heart Nerve Control||3": [
+      "Boosting Heart Nerve Control",
+      "improve autonomic nervous system control of heart function",
+      "enhance parasympathetic regulation of heart rate and rhythm",
+      "methods to strengthen vagus nerve influence on cardiac activity"
+    ],
+    "Kuna Indian Secret||3": [
+      "Kuna Indian Secret",
+      "Kuna people indigenous secrets",
+      "Kuna Indigenous knowledge and traditions",
+      "Kuna (Guna) cultural practices and spiritual beliefs"
+    ],
+    "The Healthiest Sweetener||3": [
+      "The Healthiest Sweetener",
+      "healthiest natural sweetener for baking and cooking",
+      "most nutritious low-glycemic sweetener alternatives to sugar",
+      "top scientifically supported healthy sweeteners for diabetics and weight management"
+    ],
+    "Are Artificial Colors Bad for You?||3": [
+      "Are Artificial Colors Bad for You?",
+      "Are artificial food colorings linked to adverse health effects in humans?",
+      "What are the scientifically documented health risks of synthetic food dyes?",
+      "Do FDA-approved artificial colors pose safety concerns for children or adults?"
+    ],
+    "Healthiest Airplane Beverage||3": [
+      "Healthiest Airplane Beverage",
+      "healthiest drink to order on an airplane",
+      "best low-sugar non-alcoholic beverages for air travel",
+      "most nutritious and hydrating drinks available on commercial flights"
+    ],
+    "Vitamin Supplements Worth Taking||3": [
+      "Vitamin Supplements Worth Taking",
+      "Which vitamin supplements are evidence-based and recommended by health authorities?",
+      "What vitamins have proven health benefits for adults with no deficiencies?",
+      "Are there any essential vitamin supplements that doctors commonly recommend?"
+    ],
+    "Healthy Chocolate Milkshakes||3": [
+      "Healthy Chocolate Milkshakes",
+      "Healthy chocolate milkshake recipes",
+      "Low-calorie chocolate milkshake alternatives",
+      "Nutritious chocolate smoothie recipes"
+    ],
+    "The Healthiest Vegetables||3": [
+      "The Healthiest Vegetables",
+      "most nutritious vegetables based on scientific nutrient density scores",
+      "top healthiest vegetables ranked by vitamins, minerals, and antioxidants",
+      "vegetables with highest nutrient density per calorie according to USDA or WHO guidelines"
+    ],
+    "Olive Oil and Artery Function||3": [
+      "Olive Oil and Artery Function",
+      "olive oil effects on arterial function and endothelial health",
+      "impact of extra virgin olive oil on blood vessel dilation and arterial stiffness",
+      "olive oil consumption and improvement in vascular function or endothelial function"
+    ],
+    "How Doctors Responded to Being Named a Leading Killer||3": [
+      "How Doctors Responded to Being Named a Leading Killer",
+      "How did physicians respond to the claim that medical errors are a leading cause of death in the US?",
+      "Physician reactions to Institute of Medicine report \"To Err Is Human\" on medical errors as top cause of death",
+      "Medical community response to ranking healthcare-associated harm as third-leading cause of death in America"
     ]
   },
   "decompose": {
@@ -388,6 +1766,90 @@
       "p53 pathway and cancer resistance",
       "p53 pathway leads to accumulation of senescent cells",
       "p53 pathway causes accelerated organismal aging"
+    ],
+    "Breast Cancer & Alcohol: How Much is Safe?||4": [
+      "breast cancer risk and alcohol consumption",
+      "safe alcohol intake level for breast cancer prevention",
+      "alcohol consumption guidelines for women at risk of breast cancer",
+      "dose-response relationship between alcohol and breast cancer incidence"
+    ],
+    "Optimal Phytosterol Dose and Source||4": [
+      "Optimal phytosterol dose for cholesterol reduction",
+      "Common dietary sources of phytosterols",
+      "Phytosterol bioavailability by source",
+      "Recommended daily intake of phytosterols"
+    ],
+    "Can antioxidant-rich spices counteract the effects of a high-fat meal?||4": [
+      "antioxidant-rich spices and high-fat meal interaction",
+      "effects of antioxidant-rich spices on postprandial oxidative stress",
+      "do spices reduce inflammation after high-fat meal",
+      "antioxidant spices and metabolic response to high-fat meal"
+    ],
+    "Fresh fruit versus frozen--which is better?||4": [
+      "Nutritional comparison between fresh and frozen fruit",
+      "Vitamin retention in frozen fruit versus fresh fruit",
+      "Impact of freezing on fruit antioxidants and phytonutrients",
+      "Shelf life and food safety differences between fresh and frozen fruit"
+    ],
+    "Are krill oil supplements better than fish oil capsules?||4": [
+      "Comparison of krill oil and fish oil supplement efficacy",
+      "Health benefits of krill oil supplements",
+      "Health benefits of fish oil capsules",
+      "Side effects or safety differences between krill oil and fish oil"
+    ],
+    "Is vitamin D3 (cholecalciferol) preferable to D2 (ergocalciferol)?||4": [
+      "Is vitamin D3 more effective than vitamin D2 for raising serum 25-hydroxyvitamin D levels?",
+      "Does vitamin D3 have a longer half-life in the body compared to vitamin D2?",
+      "Are there differences in bioavailability between vitamin D3 and vitamin D2?",
+      "Do clinical guidelines recommend vitamin D3 over vitamin D2 for supplementation?"
+    ],
+    "The Actual Benefit of Diet vs. Drugs||4": [
+      "Diet effectiveness for disease treatment compared to drugs",
+      "Drug effectiveness for disease treatment compared to diet",
+      "Head-to-head clinical trials comparing diet interventions and drug treatments",
+      "Meta-analyses or systematic reviews on diet vs. drugs for health outcomes"
+    ],
+    "Caloric Restriction vs. Plant-Based Diets||4": [
+      "Caloric restriction health benefits and mechanisms",
+      "Plant-based diets health benefits and mechanisms",
+      "Comparative studies of caloric restriction and plant-based diets",
+      "Differences in weight loss outcomes between caloric restriction and plant-based diets"
+    ],
+    "Treating Asthma With Plants vs. Supplements?||4": [
+      "Plant-based treatments for asthma",
+      "Dietary supplements used for asthma treatment",
+      "Comparative effectiveness of plants versus supplements for asthma",
+      "Clinical evidence comparing herbal remedies and supplements for asthma"
+    ],
+    "More Antibiotics In White Meat or Dark Meat?||4": [
+      "Antibiotic levels in white meat poultry",
+      "Antibiotic levels in dark meat poultry",
+      "Comparison of antibiotic residues between white and dark poultry meat",
+      "Regulatory limits for antibiotics in poultry meat"
+    ],
+    "Pharmacists Versus Health Food Store Employees: Who Gives Better Advice?||4": [
+      "Pharmacists' advice quality on health and medication topics",
+      "Health food store employees' advice quality on health and medication topics",
+      "Comparative studies of pharmacist vs health food store employee advice accuracy",
+      "Regulatory guidelines for health advice given by pharmacists and health food store staff"
+    ],
+    "Aluminum in Vaccines vs. Food||4": [
+      "aluminum content in vaccines",
+      "aluminum content in food",
+      "comparison of aluminum exposure from vaccines and food",
+      "safety of aluminum in vaccines versus dietary aluminum"
+    ],
+    "Alcohol Risks vs. Benefits||4": [
+      "Alcohol health risks",
+      "Alcohol health benefits",
+      "Comparative analysis of alcohol risks and benefits",
+      "Current medical consensus on alcohol consumption"
+    ],
+    "Plant vs. Cow Calcium||4": [
+      "plant calcium content",
+      "cow milk calcium content",
+      "calcium bioavailability in plants vs dairy",
+      "factors affecting calcium absorption from plant sources"
     ]
   }
 }

@@ -1,0 +1,91 @@
+{
+  "dataset": "scifact",
+  "dataset_path": "D:\\code\\rag\\FSR\\data\\scifact",
+  "queries": 300,
+  "retrieved_queries": 300,
+  "top_k_docs": 10,
+  "retrieval_elapsed_sec": 3218.507,
+  "query_type_stats": {
+    "simple": 295,
+    "fuzzy": 4,
+    "complex": 1
+  },
+  "generation_doc_agg_mode": "max",
+  "generation_score_key": "critique_score",
+  "metrics_rerank_docs": {
+    "NDCG": {
+      "NDCG@1": 0.58,
+      "NDCG@3": 0.64372,
+      "NDCG@5": 0.67297,
+      "NDCG@10": 0.7029,
+      "NDCG@20": 0.71975,
+      "NDCG@50": 0.72632,
+      "NDCG@100": 0.72632
+    },
+    "MAP": {
+      "MAP@1": 0.55356,
+      "MAP@3": 0.61558,
+      "MAP@5": 0.63521,
+      "MAP@10": 0.64932,
+      "MAP@20": 0.65463,
+      "MAP@50": 0.65603,
+      "MAP@100": 0.65603
+    },
+    "Recall": {
+      "Recall@1": 0.55356,
+      "Recall@3": 0.69294,
+      "Recall@5": 0.76406,
+      "Recall@10": 0.85344,
+      "Recall@20": 0.91589,
+      "Recall@50": 0.946,
+      "Recall@100": 0.946
+    },
+    "Precision": {
+      "P@1": 0.58,
+      "P@3": 0.24889,
+      "P@5": 0.16867,
+      "P@10": 0.09567,
+      "P@20": 0.05167,
+      "P@50": 0.0214,
+      "P@100": 0.0107
+    }
+  },
+  "metrics_generation_chunks_aggregated_to_docs": {
+    "NDCG": {
+      "NDCG@1": 0.53333,
+      "NDCG@3": 0.61073,
+      "NDCG@5": 0.63781,
+      "NDCG@10": 0.65028,
+      "NDCG@20": 0.65028,
+      "NDCG@50": 0.65028,
+      "NDCG@100": 0.65028
+    },
+    "MAP": {
+      "MAP@1": 0.49994,
+      "MAP@3": 0.58106,
+      "MAP@5": 0.59967,
+      "MAP@10": 0.60585,
+      "MAP@20": 0.60585,
+      "MAP@50": 0.60585,
+      "MAP@100": 0.60585
+    },
+    "Recall": {
+      "Recall@1": 0.49994,
+      "Recall@3": 0.66994,
+      "Recall@5": 0.7355,
+      "Recall@10": 0.76989,
+      "Recall@20": 0.76989,
+      "Recall@50": 0.76989,
+      "Recall@100": 0.76989
+    },
+    "Precision": {
+      "P@1": 0.53333,
+      "P@3": 0.24222,
+      "P@5": 0.16333,
+      "P@10": 0.087,
+      "P@20": 0.0435,
+      "P@50": 0.0174,
+      "P@100": 0.0087
+    }
+  }
+}

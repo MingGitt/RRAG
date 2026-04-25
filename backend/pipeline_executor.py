@@ -1,3 +1,4 @@
+# pipeline_executor.py
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 from config import (
@@ -5,19 +6,13 @@ from config import (
     DENSE_CANDIDATE_K,
     DOC_AGG_MODE,
     TOP_K_CHUNKS,
-    ENABLE_SELF_RAG_CRITIQUE,
-    SELF_RAG_CRITIQUE_TOP_K,
-    SELF_RAG_GENERATION_TOP_N,
-    SELF_RAG_MAX_PER_DOC,
-    SELF_RAG_MIN_SCORE,
-    SELF_RAG_W_REL,
-    SELF_RAG_W_SUP,
-    SELF_RAG_W_USE,
+    GENERATION_TOP_N,
+    GENERATION_MAX_PER_DOC,
 )
 from evaluator import RetrievalEvaluator
 from query_optimizer import QueryOptimizer
 from reranker import Reranker
-from self_rag import EvidenceCritiqueScorer, EvidenceSelector
+from chunk_critique_judge import ChunkCritiqueJudge
 
 
 def merge_retrieved_chunks(all_chunks, top_k=50):
@@ -97,6 +92,7 @@ def process_single_query(
             "doc_scores": None,
             "generation_chunks": None,
             "ranked_chunks": None,
+            "critiqued_chunks": None,
         }
 
     texts = []
@@ -128,6 +124,7 @@ def process_single_query(
             "doc_scores": None,
             "generation_chunks": None,
             "ranked_chunks": None,
+            "critiqued_chunks": None,
         }
 
     ranked_chunks = []
@@ -140,7 +137,7 @@ def process_single_query(
             "meta": meta,
         })
 
-    # ========= 文档级评估仍然保留原逻辑 =========
+    # 文档级评估保留原逻辑
     doc_level_for_eval = [
         (item["doc_id"], item["text"], item["score"])
         for item in ranked_chunks
@@ -158,35 +155,22 @@ def process_single_query(
             "doc_scores": None,
             "generation_chunks": None,
             "ranked_chunks": ranked_chunks,
+            "critiqued_chunks": None,
         }
 
-    # ========= Self-RAG: rerank 后 evidence critique =========
-    if ENABLE_SELF_RAG_CRITIQUE:
-        critique_input = ranked_chunks[:SELF_RAG_CRITIQUE_TOP_K]
+    # 新版 critique：一次判断 relevance + usefulness
+    critique_input = ranked_chunks[:TOP_K_CHUNKS]
+    critiqued_chunks = ChunkCritiqueJudge.judge_chunks(query, critique_input)
 
-        scorer = EvidenceCritiqueScorer(
-            w_rel=SELF_RAG_W_REL,
-            w_sup=SELF_RAG_W_SUP,
-            w_use=SELF_RAG_W_USE,
-        )
-        selector = EvidenceSelector(min_score=SELF_RAG_MIN_SCORE)
+    gen_chunks = ChunkCritiqueJudge.select_generation_chunks(
+        critiqued_chunks,
+        top_n=GENERATION_TOP_N,
+        max_per_doc=GENERATION_MAX_PER_DOC,
+        min_score=0.35,
+    )
 
-        scored_chunks = scorer.score_chunks(query, critique_input)
-
-        gen_chunks = selector.select_generation_chunks(
-            scored_chunks,
-            top_n=SELF_RAG_GENERATION_TOP_N,
-            max_per_doc=SELF_RAG_MAX_PER_DOC
-        )
-
-        # 如果一个都没留下，则回退到原 rerank 结果
-        if not gen_chunks:
-            gen_chunks = selector.fallback_select(
-                ranked_chunks,
-                top_n=SELF_RAG_GENERATION_TOP_N,
-                max_per_doc=SELF_RAG_MAX_PER_DOC
-            )
-    else:
+    # 如果一个都没留下，则回退到原 rerank 结果
+    if not gen_chunks:
         gen_chunks_input = [
             {
                 "doc_id": item["doc_id"],
@@ -196,11 +180,10 @@ def process_single_query(
             }
             for item in ranked_chunks
         ]
-
         gen_chunks = Reranker.select_generation_chunks(
             gen_chunks_input,
-            top_n=5,
-            max_per_doc=3
+            top_n=GENERATION_TOP_N,
+            max_per_doc=GENERATION_MAX_PER_DOC
         )
 
     return {
@@ -209,6 +192,7 @@ def process_single_query(
         "doc_scores": doc_scores,
         "generation_chunks": gen_chunks,
         "ranked_chunks": ranked_chunks,
+        "critiqued_chunks": critiqued_chunks,
     }
 
 
@@ -223,6 +207,7 @@ def run_parallel_retrieval_pipeline(
     rerank_results_with_scores = {}
     generation_chunks = {}
     ranked_chunks_map = {}
+    critiqued_chunks_map = {}
     query_type_stats = {}
 
     with ThreadPoolExecutor(max_workers=subquery_workers) as subquery_executor:
@@ -251,6 +236,7 @@ def run_parallel_retrieval_pipeline(
                 doc_scores = result["doc_scores"]
                 gen_chunks = result["generation_chunks"]
                 ranked_chunks = result["ranked_chunks"]
+                critiqued_chunks = result.get("critiqued_chunks")
 
                 query_type_stats[qtype] = query_type_stats.get(qtype, 0) + 1
 
@@ -260,5 +246,7 @@ def run_parallel_retrieval_pipeline(
                     generation_chunks[qid] = gen_chunks
                 if ranked_chunks:
                     ranked_chunks_map[qid] = ranked_chunks
+                if critiqued_chunks:
+                    critiqued_chunks_map[qid] = critiqued_chunks
 
     return rerank_results_with_scores, generation_chunks, ranked_chunks_map, query_type_stats

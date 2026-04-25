@@ -1,8 +1,10 @@
+# qa_service.py
 import asyncio
 
 from config import SHOW_TOP_K, SUBQUERY_WORKERS
 from generator import Generator
 from pipeline_executor import run_parallel_retrieval_pipeline
+from retrieval_judge import RetrievalJudge
 
 
 def format_source(meta: dict, doc_id: str):
@@ -37,11 +39,32 @@ def answer_one_query(
     reranker_lock,
 ):
     """
-    对单个 query 执行完整问答流程：
-    原检索链路 -> Self-RAG 生成
+    新版完整问答流程：
+    Step 1: qwen-plus 检索决策
+      - No: 直接 qwen-plus 回答
+      - Yes: 进入原检索链路，再由新版 Generator 完成 Step 3~6
     """
     queries = {query_id: query_text}
 
+    # Step 1: 检索决策
+    retrieve_decision = RetrievalJudge.decide_retrieval(
+        user_query=query_text,
+        history_text="",
+    )
+
+    if retrieve_decision == "No":
+        direct_output = Generator.generate_direct_answer(query_text)
+        return {
+            "query_type_stats": {"no_retrieval": 1},
+            "rerank_results_with_scores": {},
+            "generation_chunks": {},
+            "ranked_chunks_map": {},
+            "gen_outputs": {
+                query_id: direct_output
+            },
+        }
+
+    # Step 2: 执行检索
     rerank_results_with_scores, generation_chunks, ranked_chunks_map, query_type_stats = run_parallel_retrieval_pipeline(
         queries=queries,
         retriever=retriever,
@@ -51,6 +74,13 @@ def answer_one_query(
         subquery_workers=SUBQUERY_WORKERS,
     )
 
+    # 如果 generation_chunks 为空，兜底用 ranked_chunks_map 前几条
+    if query_id not in generation_chunks or not generation_chunks.get(query_id):
+        ranked = ranked_chunks_map.get(query_id, [])
+        if ranked:
+            generation_chunks[query_id] = ranked[:5]
+
+    # Step 3~6: relevance -> answer -> support -> hard constraint
     gen_outputs = asyncio.run(
         Generator.run(
             queries,
@@ -105,10 +135,10 @@ def print_single_answer_result(query_id, query_text, result):
     citations = gen_output.get("citations", [])
     print_citations(citations)
 
-    print("\n========== Self-RAG Reflections ==========")
+    print("\n========== Reflections ==========")
     print(gen_output.get("reflections", {}))
 
-    print("\n========== Raw Self-RAG Output ==========")
+    print("\n========== Raw Output ==========")
     print(gen_output.get("raw_text", ""))
 
 

@@ -1,38 +1,45 @@
+# retrieval_judge.py
+from config import QWEN_DECISION_MODEL
 from qwen_client import QwenClient
 
 
 class RetrievalJudge:
     """
-    用原来的 LLM 做“是否需要检索”的判断。
+    Step 1: 检索决策
+    输出：
+      [Retrieve=Yes]
+      [Retrieve=No]
     """
 
     @staticmethod
     def decide_retrieval(user_query: str, history_text: str = "") -> str:
         prompt = f"""
-你是一个文档问答系统中的“检索决策器”。
+你是一个文档智能检索系统中的“检索决策器”。
 
 历史对话：
 {history_text if history_text.strip() else "无"}
 
-当前问题：
+当前用户查询：
 {user_query}
 
 任务：
-判断在回答这个问题之前，是否必须先检索上传的文档内容。
+判断这个问题在回答之前是否必须先检索上传文档中的内容。
 
 判断规则：
-1. 如果问题在询问上传文档、文件、论文、报告、合同、PDF、DOCX、TXT中的内容、结论、定义、条款、实验结果、数据、摘要、证据、原文、核心观点，输出 [Retrieve=Yes]
+1. 如果问题询问上传文档、论文、报告、合同、PDF、DOCX、TXT中的事实、条款、实验结果、结论、证据、定义、摘要、原文内容，输出 [Retrieve=Yes]
 2. 如果问题依赖文档上下文才能准确回答，输出 [Retrieve=Yes]
-3. 如果问题只是寒暄、问候、与文档无关的泛化聊天，输出 [Retrieve=No]
-4. 只输出一个结果，不要解释
+3. 如果问题是泛化闲聊、通用常识、与文档无关，输出 [Retrieve=No]
+4. 只能输出一个结果，不要解释
 
-请严格只输出以下两者之一：
+请严格只输出：
 [Retrieve=Yes]
+或
 [Retrieve=No]
 """.strip()
 
         answer = QwenClient.call(
             [{"role": "user", "content": prompt}],
+            model=QWEN_DECISION_MODEL,
             temperature=0.0,
             max_tokens=32,
         )
