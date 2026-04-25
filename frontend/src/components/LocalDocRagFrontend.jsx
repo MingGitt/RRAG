@@ -177,6 +177,7 @@ function CandidatesPanel({ candidates }) {
               isrel = {item.isrel}，
               issup = {item.issup}，
               isuse = {item.isuse}
+              {item.subquery ? `，subquery = ${item.subquery}` : ""}
             </div>
             <div className="candidate-answer">{item.answer || "无内容"}</div>
           </div>
@@ -206,16 +207,79 @@ function CitationsPanel({ citations }) {
   );
 }
 
+function SubAnswersPanel({ subAnswers }) {
+  if (!subAnswers?.length) return null;
+
+  return (
+    <div className="meta-panel">
+      <div className="meta-title">子查询结果</div>
+      <div className="subanswer-list">
+        {subAnswers.map((item, idx) => (
+          <div className="subanswer-card" key={`${idx}-${item.subquery}`}>
+            <div className="subanswer-head">
+              <span className="subanswer-index">子查询 {idx + 1}</span>
+              <span className="subanswer-score">
+                best_score = {Number(item.best_score ?? 0).toFixed(4)}
+              </span>
+            </div>
+
+            <div className="subanswer-block">
+              <div className="subanswer-label">子查询</div>
+              <div className="subanswer-query">{item.subquery || "无"}</div>
+            </div>
+
+            <div className="subanswer-block">
+              <div className="subanswer-label">子查询答案</div>
+              <div className="subanswer-answer">{item.answer || "无内容"}</div>
+            </div>
+
+            <div className="subanswer-block">
+              <div className="subanswer-label">对应证据块</div>
+              {item.citations?.length ? (
+                <div className="citation-list compact">
+                  {item.citations.map((c) => (
+                    <div className="citation-card" key={`${idx}-${c.index}-${c.source}`}>
+                      <div className="citation-source">
+                        [{c.index}] {c.source}
+                      </div>
+                      <div className="citation-excerpt">{c.excerpt}</div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="subanswer-empty">无证据块</div>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function AssistantMessage({ msg }) {
+  const showSubAnswers =
+    (msg.query_mode === "fuzzy" || msg.query_mode === "complex") &&
+    msg.sub_answers?.length > 0;
+
   return (
     <div className="message assistant">
       <div className="avatar"><Bot size={18} /></div>
       <div className="bubble-wrap">
         <div className="bubble">{msg.content || "未返回答案。"}</div>
-        <CitationsPanel citations={msg.citations} />
+
+        {showSubAnswers ? (
+          <SubAnswersPanel subAnswers={msg.sub_answers} />
+        ) : (
+          <>
+            <CitationsPanel citations={msg.citations} />
+            <CandidatesPanel candidates={msg.candidates} />
+          </>
+        )}
+
         <ReflectionPanel reflections={msg.reflections} />
         <TracePanel trace={msg.trace} />
-        <CandidatesPanel candidates={msg.candidates} />
+
         <div className="risk-row">
           <RiskBadge risk={msg.retrieval_risk} />
           <RiskBadge risk={msg.generation_risk} />
@@ -255,10 +319,12 @@ export default function LocalDocRagFrontend() {
       role: "assistant",
       content:
         "你好，请先上传 PDF、DOCX 或 TXT 文档。文件完成索引后，就可以基于当前文档进行问答。",
+      query_mode: "simple",
       citations: [],
       reflections: [],
       trace: [],
       candidates: [],
+      sub_answers: [],
       retrieval_risk: null,
       generation_risk: null,
     },
@@ -419,10 +485,12 @@ export default function LocalDocRagFrontend() {
         id: `assistant-${Date.now()}`,
         role: "assistant",
         content: data.answer || "未返回答案。",
+        query_mode: data.query_mode || "simple",
         citations: data.citations || [],
         reflections: data.reflections || [],
         trace: data.trace || [],
         candidates: data.candidates || [],
+        sub_answers: data.sub_answers || [],
         retrieval_risk: data.retrieval_risk || null,
         generation_risk: data.generation_risk || null,
       };
@@ -435,10 +503,12 @@ export default function LocalDocRagFrontend() {
           id: `assistant-error-${Date.now()}`,
           role: "assistant",
           content: `请求失败：${e.message}`,
+          query_mode: "simple",
           citations: [],
           reflections: [],
           trace: [],
           candidates: [],
+          sub_answers: [],
           retrieval_risk: null,
           generation_risk: null,
         },
@@ -460,9 +530,9 @@ export default function LocalDocRagFrontend() {
       <div className="page-inner">
         <header className="hero">
           <div>
-            <h1>文档智能问答系统</h1>
+            <h1>RRAG 文档智能问答系统</h1>
             <p>
-              便捷的文档检索服务
+              基于当前已上传文档进行检索、重排、风险评估与 Self-RAG 生成。
             </p>
           </div>
           <div className="hero-stats">

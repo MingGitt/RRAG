@@ -535,7 +535,8 @@ button {
 
 .citation-list,
 .candidate-list,
-.trace-list {
+.trace-list,
+.subanswer-list {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -544,7 +545,8 @@ button {
 .citation-card,
 .candidate-card,
 .trace-item,
-.reflection-card {
+.reflection-card,
+.subanswer-card {
   border: 1px solid #e5e7eb;
   background: white;
   border-radius: 12px;
@@ -557,7 +559,9 @@ button {
 }
 
 .citation-excerpt,
-.candidate-answer {
+.candidate-answer,
+.subanswer-query,
+.subanswer-answer {
   color: #374151;
   white-space: pre-wrap;
   word-break: break-word;
@@ -592,7 +596,9 @@ button {
   font-size: 12px;
 }
 
-.trace-head {
+.trace-head,
+.subanswer-head,
+.candidate-score-row {
   display: flex;
   justify-content: space-between;
   gap: 8px;
@@ -603,7 +609,8 @@ button {
   font-weight: 700;
 }
 
-.trace-round {
+.trace-round,
+.subanswer-score {
   font-size: 12px;
   color: var(--muted);
 }
@@ -619,18 +626,35 @@ button {
   padding: 0;
 }
 
-.candidate-score-row {
-  display: flex;
-  justify-content: space-between;
-  gap: 8px;
-  font-weight: 700;
-  margin-bottom: 6px;
-}
-
 .candidate-score-sub {
   color: var(--muted);
   font-size: 12px;
   margin-bottom: 8px;
+}
+
+.subanswer-index {
+  color: #111827;
+  font-weight: 700;
+}
+
+.subanswer-block + .subanswer-block {
+  margin-top: 10px;
+}
+
+.subanswer-label {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+  margin-bottom: 6px;
+}
+
+.subanswer-empty {
+  font-size: 12px;
+  color: #6b7280;
+}
+
+.citation-list.compact {
+  gap: 8px;
 }
 
 .risk-row {

@@ -16,12 +16,9 @@ from config import (
     PERSIST_DIR,
 )
 from data_loader import MultiFormatLoader
-from generator import Generator
 from hybrid_retriever import MultiVectorRetriever
-from pipeline_executor import run_parallel_retrieval_pipeline
-from qwen_client import QwenClient
+from qa_service import answer_one_query
 from reranker import Reranker
-from retrieval_judge import RetrievalJudge
 from vector_store import VectorStoreBuilder
 
 
@@ -35,7 +32,7 @@ PERSIST_ROOT = Path(PERSIST_DIR)
 PERSIST_ROOT.mkdir(parents=True, exist_ok=True)
 
 
-app = FastAPI(title="Local Document QA API", version="6.1.0")
+app = FastAPI(title="Local Document QA API", version="8.0.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -92,6 +89,7 @@ class CandidateItem(BaseModel):
     isuse: int = 1
     evidence_score: float = 0.0
     final_score: float = 0.0
+    subquery: str = ""
 
 
 class RiskInfo(BaseModel):
@@ -100,12 +98,21 @@ class RiskInfo(BaseModel):
     detail: str = ""
 
 
+class SubAnswerItem(BaseModel):
+    subquery: str
+    answer: str
+    citations: List[CitationItem] = []
+    best_score: float = 0.0
+
+
 class AskResponse(BaseModel):
     answer: str
+    query_mode: str = "simple"
     citations: List[CitationItem]
     reflections: List[ReflectionItem]
     trace: List[TraceItem]
     candidates: List[CandidateItem] = []
+    sub_answers: List[SubAnswerItem] = []
     retrieval_risk: Optional[RiskInfo] = None
     generation_risk: Optional[RiskInfo] = None
 
@@ -273,29 +280,6 @@ def compact_assistant_history(text: str, max_len: int = 180) -> str:
     return text[:max_len].rstrip() + "..."
 
 
-def direct_answer_by_llm(query_text: str, history: List[Dict]) -> str:
-    history_text = history_to_text(history)
-
-    prompt = f"""
-你是一个问答助手。
-
-历史对话：
-{history_text if history_text else "无"}
-
-当前问题：
-{query_text}
-
-请直接给出自然语言回答，不要输出额外标签。
-""".strip()
-
-    answer = QwenClient.call(
-        [{"role": "user", "content": prompt}],
-        temperature=0.2,
-        max_tokens=512,
-    )
-    return answer or "抱歉，我暂时无法生成回答。"
-
-
 def _safe_float(val, default=0.0):
     try:
         return float(val)
@@ -310,159 +294,146 @@ def _safe_int(val, default=1):
         return default
 
 
+def _build_query_mode(query_type_stats: Dict) -> str:
+    if not query_type_stats:
+        return "simple"
+    if query_type_stats.get("complex"):
+        return "complex"
+    if query_type_stats.get("fuzzy"):
+        return "fuzzy"
+    return "simple"
+
+
+def _convert_sub_answers(raw_sub_answers: List[Dict]) -> List[SubAnswerItem]:
+    sub_answers = []
+    for item in raw_sub_answers or []:
+        raw_citations = item.get("citations", []) or []
+        citations = [
+            CitationItem(
+                index=c.get("index", idx + 1),
+                source=c.get("source", ""),
+                excerpt=c.get("excerpt", ""),
+            )
+            for idx, c in enumerate(raw_citations)
+        ]
+        sub_answers.append(
+            SubAnswerItem(
+                subquery=item.get("subquery", ""),
+                answer=item.get("answer", ""),
+                citations=citations,
+                best_score=_safe_float(item.get("best_score", 0.0), 0.0),
+            )
+        )
+    return sub_answers
+
+
 async def answer_one_query_api(query_text: str, session_id: str = "default"):
     history = get_session_history(session_id)
 
-    trace: List[TraceItem] = []
-    reflections: List[ReflectionItem] = []
-    candidates: List[CandidateItem] = []
-    citations: List[CitationItem] = []
+    if app_state["reranker"] is None:
+        app_state["reranker"] = Reranker()
 
-    initial_decision = RetrievalJudge.decide_retrieval(
-        user_query=query_text,
-        history_text=history_to_text(history),
+    retriever = build_retriever()
+    qid = f"api_query_{session_id}"
+
+    result = await answer_one_query(
+        query_id=qid,
+        query_text=query_text,
+        retriever=retriever,
+        reranker=app_state["reranker"],
+        reranker_lock=app_state["reranker_lock"],
     )
 
-    trace.append(
+    query_type_stats = result.get("query_type_stats", {}) or {}
+    gen_output = (result.get("gen_outputs", {}) or {}).get(qid, {}) or {}
+    ranked_chunks_map = result.get("ranked_chunks_map", {}) or {}
+
+    query_mode = _build_query_mode(query_type_stats)
+
+    trace: List[TraceItem] = [
         TraceItem(
-            stage="initial_decision",
+            stage="query_pipeline",
             query=query_text,
             round=1,
-            retrieve=initial_decision,
-            detail="使用 RetrievalJudge + 原 LLM 判断是否需要进入检索流程",
+            retrieve=gen_output.get("reflections", {}).get("retrieve", "Unknown"),
+            retrieved_count=len(ranked_chunks_map.get(qid, [])),
+            top_sources=[
+                f'{item["meta"].get("title", item["doc_id"])}'
+                for item in ranked_chunks_map.get(qid, [])[:5]
+            ] if ranked_chunks_map.get(qid) else [],
+            detail=f"query_mode={query_mode}, query_type_stats={query_type_stats}",
         )
-    )
+    ]
 
-    if initial_decision == "No":
-        answer = direct_answer_by_llm(query_text, history)
-
-        history.append({"role": "user", "content": query_text})
-        history.append({"role": "assistant", "content": compact_assistant_history(answer)})
-
-        return AskResponse(
-            answer=answer,
-            citations=[],
-            reflections=[],
-            trace=trace,
-            candidates=[],
-            retrieval_risk=None,
-            generation_risk=None,
+    citations = [
+        CitationItem(
+            index=item["index"],
+            source=item["source"],
+            excerpt=item["excerpt"],
         )
+        for item in gen_output.get("citations", [])
+    ]
 
-    if not app_state["file_indexes"]:
-        raise HTTPException(status_code=400, detail="当前没有已索引文档，无法执行检索。")
-
-    try:
-        if app_state["reranker"] is None:
-            app_state["reranker"] = Reranker()
-
-        retriever = build_retriever()
-        qid = f"api_query_{session_id}"
-        queries = {qid: query_text}
-
-        rerank_results_with_scores, generation_chunks, ranked_chunks_map, query_type_stats = run_parallel_retrieval_pipeline(
-            queries=queries,
-            retriever=retriever,
-            reranker=app_state["reranker"],
-            reranker_lock=app_state["reranker_lock"],
-            query_workers=1,
-            subquery_workers=1,
-        )
-
-        trace.append(
-            TraceItem(
-                stage="retrieval_pipeline",
-                query=query_text,
+    reflections = []
+    ref = gen_output.get("reflections", {})
+    if ref:
+        reflections.append(
+            ReflectionItem(
                 round=1,
-                retrieve="Yes",
-                retrieved_count=len(ranked_chunks_map.get(qid, [])),
-                top_sources=[
-                    f'{item["meta"].get("title", item["doc_id"])}'
-                    for item in ranked_chunks_map.get(qid, [])[:5]
-                ],
-                detail=f"已进入原检索链路，query_type_stats={query_type_stats}",
+                retrieve=ref.get("retrieve", "Unknown"),
+                isrel=ref.get("isrel", "Unknown"),
+                issup=ref.get("issup", "Unknown"),
+                isuse=_safe_int(ref.get("isuse", 1), 1),
+                followup_query=ref.get("followup_query", "None"),
+                raw_text=gen_output.get("raw_text", ""),
             )
         )
 
-        gen_outputs = await Generator.run(
-            queries,
-            generation_chunks,
-            max_samples=1,
-            max_concurrency=1
+    candidates = []
+    for item in gen_output.get("candidates", []) or []:
+        candidates.append(
+            CandidateItem(
+                answer=item.get("answer", ""),
+                retrieve=item.get("retrieve", "Unknown"),
+                isrel=item.get("isrel", "Unknown"),
+                issup=item.get("issup", "Unknown"),
+                isuse=_safe_int(item.get("isuse", 1), 1),
+                evidence_score=_safe_float(item.get("evidence_score", 0.0), 0.0),
+                final_score=_safe_float(item.get("final_score", 0.0), 0.0),
+                subquery=item.get("subquery", ""),
+            )
         )
 
-        gen_output = gen_outputs.get(qid, {})
-        answer = gen_output.get("answer", "")
+    sub_answers = _convert_sub_answers(gen_output.get("sub_answers", []) or [])
 
-        history.append({"role": "user", "content": query_text})
-        history.append({"role": "assistant", "content": compact_assistant_history(answer)})
+    retrieval_risk = None
 
-        for item in gen_output.get("citations", []):
-            citations.append(
-                CitationItem(
-                    index=item["index"],
-                    source=item["source"],
-                    excerpt=item["excerpt"],
-                )
-            )
-
-        ref = gen_output.get("reflections", {})
-        if ref:
-            reflections.append(
-                ReflectionItem(
-                    round=1,
-                    retrieve=ref.get("retrieve", "Unknown"),
-                    isrel=ref.get("isrel", "Unknown"),
-                    issup=ref.get("issup", "Unknown"),
-                    isuse=_safe_int(ref.get("isuse", 1), 1),
-                    followup_query=ref.get("followup_query", "None"),
-                    raw_text=gen_output.get("raw_text", ""),
-                )
-            )
-
-        for item in gen_output.get("candidates", []):
-            candidates.append(
-                CandidateItem(
-                    answer=item.get("answer", ""),
-                    retrieve=item.get("retrieve", "Unknown"),
-                    isrel=item.get("isrel", "Unknown"),
-                    issup=item.get("issup", "Unknown"),
-                    isuse=_safe_int(item.get("isuse", 1), 1),
-                    evidence_score=_safe_float(item.get("evidence_score", 0.0), 0.0),
-                    final_score=_safe_float(item.get("final_score", 0.0), 0.0),
-                )
-            )
-
-        retrieval_risk = None
-        raw_retrieval_risk = gen_output.get("retrieval_risk")
-        if raw_retrieval_risk:
-            retrieval_risk = RiskInfo(
-                risk_level=raw_retrieval_risk.get("risk_level", "unknown"),
-                risk_score=_safe_float(raw_retrieval_risk.get("risk_score", 0.0), 0.0),
-                detail=raw_retrieval_risk.get("detail", ""),
-            )
-
-        generation_risk = None
-        raw_generation_risk = gen_output.get("generation_risk")
-        if raw_generation_risk:
-            generation_risk = RiskInfo(
-                risk_level=raw_generation_risk.get("risk_level", "unknown"),
-                risk_score=_safe_float(raw_generation_risk.get("risk_score", 0.0), 0.0),
-                detail=raw_generation_risk.get("detail", ""),
-            )
-
-        return AskResponse(
-            answer=answer,
-            citations=citations,
-            reflections=reflections,
-            trace=trace,
-            candidates=candidates,
-            retrieval_risk=retrieval_risk,
-            generation_risk=generation_risk,
+    generation_risk = None
+    raw_generation_risk = gen_output.get("generation_risk")
+    if raw_generation_risk:
+        generation_risk = RiskInfo(
+            risk_level=raw_generation_risk.get("risk_level", "unknown"),
+            risk_score=_safe_float(raw_generation_risk.get("risk_score", 0.0), 0.0),
+            detail=str(raw_generation_risk.get("reasons", "")),
         )
 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"问答失败: {str(e)}")
+    answer = gen_output.get("answer", "")
+
+    history.append({"role": "user", "content": query_text})
+    history.append({"role": "assistant", "content": compact_assistant_history(answer)})
+
+    # fuzzy / complex 时，前端主要展示 sub_answers；总 citations / candidates 仍返回，但可由前端隐藏
+    return AskResponse(
+        answer=answer,
+        query_mode=query_mode,
+        citations=citations,
+        reflections=reflections,
+        trace=trace,
+        candidates=candidates,
+        sub_answers=sub_answers,
+        retrieval_risk=retrieval_risk,
+        generation_risk=generation_risk,
+    )
 
 
 @app.on_event("startup")
