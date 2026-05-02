@@ -67,3 +67,7 @@ __pycache__/
 
 # 历史备份
 .history/
+
+chroma_kilt_nq_200_single/
+data/
+docs/
