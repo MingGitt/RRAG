@@ -1,0 +1,333 @@
+[33mcommit a94e6b0534bea4031afb068b31fbe52aa1f1f69c[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m
+Author: MingGitt <15180232305@163.com>
+Date:   Sat May 2 22:11:32 2026 +0800
+
+    还想改改先备份
+
+[1mdiff --git a/backend/copy_p.py b/backend/copy_p.py[m
+[1mindex 92665f0..75203f2 100644[m
+[1m--- a/backend/copy_p.py[m
+[1m+++ b/backend/copy_p.py[m
+[36m@@ -1,86 +1,31 @@[m
+[31m-import json[m
+ import os[m
+[31m-from collections import defaultdict[m
+[32m+[m[32mimport requests[m
+ [m
+[31m-# 1. 检查 qrel 文件内容格式[m
+[31m-print("=" * 50)[m
+[31m-print("1. 检查 qrel 文件格式")[m
+[31m-print("=" * 50)[m
+[32m+[m[32mURL = "http://curtis.ml.cmu.edu/datasets/hotpot/hotpot_dev_distractor_v1.json"[m
+ [m
+[31m-qrel_file = "D:/code/rag/FSR/data/nfcorpus/qrels/test.tsv"[m
+[31m-with open(qrel_file, 'r') as f:[m
+[31m-    print("前5行内容:")[m
+[31m-    for i, line in enumerate(f):[m
+[31m-        if i >= 5:[m
+[31m-            break[m
+[31m-        print(f"  {line.strip()}")[m
+[31m-        parts = line.strip().split('\t')[m
+[31m-        print(f"    列数: {len(parts)}, 内容: {parts}")[m
+[32m+[m[32mSAVE_DIR = r"D:\code\rag\FSR\data\hotpotqa_distractor"[m
+[32m+[m[32mSAVE_PATH = os.path.join(SAVE_DIR, "hotpot_dev_distractor_v1.json")[m
+ [m
+[31m-# 2. 检查评估结果中的召回情况[m
+[31m-print("\n" + "=" * 50)[m
+[31m-print("2. 检查评估结果详情")[m
+[31m-print("=" * 50)[m
+[32m+[m[32mdef main():[m
+[32m+[m[32m    os.makedirs(SAVE_DIR, exist_ok=True)[m
+ [m
+[31m-details_file = "D:/code/rag/FSR/backend/nfcorpus_full_retrieval_details.jsonl"[m
+[31m-if os.path.exists(details_file):[m
+[31m-    query_stats = [][m
+[31m-    with open(details_file, 'r') as f:[m
+[31m-        for line in f:[m
+[31m-            data = json.loads(line)[m
+[31m-            retrieved = data.get('retrieved_docs', [])[m
+[31m-            [m
+[31m-            # 统计前50和前100中相关文档数[m
+[31m-            rel_50 = sum(1 for d in retrieved[:50] if d.get('relevance', 0) == 1)[m
+[31m-            rel_100 = sum(1 for d in retrieved[:100] if d.get('relevance', 0) == 1)[m
+[31m-            [m
+[31m-            query_stats.append({[m
+[31m-                'qid': data['query_id'],[m
+[31m-                'rel_50': rel_50,[m
+[31m-                'rel_100': rel_100,[m
+[31m-                'total_retrieved': len(retrieved)[m
+[31m-            })[m
+[31m-            [m
+[31m-            if len(query_stats) >= 10:  # 只看前10条[m
+[31m-                break[m
+[31m-    [m
+[31m-    # 统计有多少 query 的 rel_100 > rel_50[m
+[31m-    increased = sum(1 for s in query_stats if s['rel_100'] > s['rel_50'])[m
+[31m-    print(f"前10个查询中:")[m
+[31m-    print(f"  有 {increased} 个查询在 Top100 中找到的相关文档多于 Top50")[m
+[31m-    for s in query_stats[:5]:[m
+[31m-        print(f"  Query {s['qid']}: Top50相关={s['rel_50']}, Top100相关={s['rel_100']}, 总返回={s['total_retrieved']}")[m
+[31m-else:[m
+[31m-    print("未找到详情文件")[m
+[32m+[m[32m    print("Downloading HotpotQA dev distractor...")[m
+[32m+[m[32m    print("URL:", URL)[m
+ [m
+[31m-# 3. 计算理论上的最大 Recall[m
+[31m-print("\n" + "=" * 50)[m
+[31m-print("3. 理论分析")[m
+[31m-print("=" * 50)[m
+[32m+[m[32m    with requests.get(URL, stream=True, timeout=60) as r:[m
+[32m+[m[32m        r.raise_for_status()[m
+[32m+[m[32m        total = int(r.headers.get("content-length", 0))[m
+[32m+[m[32m        downloaded = 0[m
+ [m
+[31m-# 从 qrel 统计每个 query 的总相关文档数[m
+[31m-from collections import defaultdict[m
+[31m-total_relevant = defaultdict(int)[m
+[31m-with open(qrel_file, 'r') as f:[m
+[31m-    for line in f:[m
+[31m-        parts = line.strip().split('\t')[m
+[31m-        if len(parts) >= 3:[m
+[31m-            qid = parts[0][m
+[31m-            try:[m
+[31m-                score = float(parts[2])[m
+[31m-                if score >= 1:[m
+[31m-                    total_relevant[qid] += 1[m
+[31m-            except:[m
+[31m-                pass[m
+[32m+[m[32m        with open(SAVE_PATH, "wb") as f:[m
+[32m+[m[32m            for chunk in r.iter_content(chunk_size=1024 * 1024):[m
+[32m+[m[32m                if chunk:[m
+[32m+[m[32m                    f.write(chunk)[m
+[32m+[m[32m                    downloaded += len(chunk)[m
+[32m+[m[32m                    if total:[m
+[32m+[m[32m                        print(f"\r{downloaded / total * 100:.2f}%", end="")[m
+ [m
+[31m-if total_relevant:[m
+[31m-    print(f"test.tsv 统计:")[m
+[31m-    print(f"  查询数: {len(total_relevant)}")[m
+[31m-    print(f"  平均相关文档数: {sum(total_relevant.values())/len(total_relevant):.1f}")[m
+[31m-    print(f"  最大相关文档数: {max(total_relevant.values())}")[m
+[31m-    [m
+[31m-    # 找出相关文档数 > 50 的查询示例[m
+[31m-    high_rel_queries = [(qid, count) for qid, count in total_relevant.items() if count > 50][m
+[31m-    print(f"  相关文档超过50个的查询数: {len(high_rel_queries)}")[m
+[31m-    if high_rel_queries:[m
+[31m-        print(f"  示例: {high_rel_queries[:3]}")[m
+\ No newline at end of file[m
+[32m+[m[32m    print("\nSaved to:", SAVE_PATH)[m
+[32m+[m
+[32m+[m[32mif __name__ == "__main__":[m
+[32m+[m[32m    main()[m
+\ No newline at end of file[m
+[1mdiff --git a/beir_datasets/hotpotqa/corpus.jsonl b/beir_datasets/hotpotqa/corpus.jsonl[m
+[1mnew file mode 100644[m
+[1mindex 0000000..c506957[m
+Binary files /dev/null and b/beir_datasets/hotpotqa/corpus.jsonl differ
+[1mdiff --git a/beir_datasets/hotpotqa/qrels/dev.tsv b/beir_datasets/hotpotqa/qrels/dev.tsv[m
+[1mnew file mode 100644[m
+[1mindex 0000000..2328347[m
+[1m--- /dev/null[m
+[1m+++ b/beir_datasets/hotpotqa/qrels/dev.tsv[m
+[36m@@ -0,0 +1,10895 @@[m
+[32m+[m[32mquery-id	corpus-id	score[m
+[32m+[m[32m5ae81fbf55429952e35eaa37	6607768	1[m
+[32m+[m[32m5ae81fbf55429952e35eaa37	87161	1[m
+[32m+[m[32m5a72d90d55429901807daf53	53835801	1[m
+[32m+[m[32m5a72d90d55429901807daf53	1439517	1[m
+[32m+[m[32m5ab2eed755429929539468c9	46920674	1[m
+[32m+[m[32m5ab2eed755429929539468c9	2638000	1[m
+[32m+[m[32m5ac4401b5542997ea680ca4c	47775055	1[m
+[32m+[m[32m5ac4401b5542997ea680ca4c	32294636	1[m
+[32m+[m[32m5ae142a4554299422ee9964a	27452573	1[m
+[32m+[m[32m5ae142a4554299422ee9964a	1216600	1[m
+[32m+[m[32m5a7a25835542990783324e93	7343862	1[m
+[32m+[m[32m5a7a25835542990783324e93	148703	1[m
+[32m+[m[32m5a7914c655429907847277a9	9090094	1[m
+[32m+[m[32m5a7914c655429907847277a9	1194329	1[m
+[32m+[m[32m5ac3f46f55429919431738df	36921197	1[m
+[32m+[m[32m5ac3f46f55429919431738df	78358	1[m
+[32m+[m[32m5ac50a1b5542996feb3fe9dd	8258000	1[m
+[32m+[m[32m5ac50a1b5542996feb3fe9dd	24503	1[m
+[32m+[m[32m5a7fbc715542995d8a8ddf08	1705316	1[m
+[32m+[m[32m5a7fbc715542995d8a8ddf08	4513177	1[m
+[32m+[m[32m5a73817e554299623ed4abc0	43929572	1[m
+[32m+[m[32m5a73817e554299623ed4abc0	31134	1[m
+[32m+[m[32m5ac1773f5542994ab5c67d52	27350188	1[m
+[32m+[m[32m5ac1773f5542994ab5c67d52	438275	1[m
+[32m+[m[32m5a8098635542992097ad3001	46209853	1[m
+[32m+[m[32m5a8098635542992097ad3001	34361590	1[m
+[32m+[m[32m5ae61bf25542995703ce8b06	870393	1[m
+[32m+[m[32m5ae61bf25542995703ce8b06	1110047	1[m
+[32m+[m[32m5ade950c5542992fa25da7d2	8280247	1[m
+[32m+[m[32m5ade950c5542992fa25da7d2	147944	1[m
+[32m+[m[32m5adfc7795542992d7e9f93ce	46641693	1[m
+[32m+[m[32m5adfc7795542992d7e9f93ce	30528002	1[m
+[32m+[m[32m5ac4d5f05542997ea680cac9	26482249	1[m
+[32m+[m[32m5ac4d5f05542997ea680cac9	24113	1[m
+[32m+[m[32m5a82b13f55429954d2e2ebac	50533440	1[m
+[32m+[m[32m5a82b13f55429954d2e2ebac	50414934	1[m
+[32m+[m[32m5ae24f905542992decbdccad	926247	1[m
+[32m+[m[32m5ae24f905542992decbdccad	6951166	1[m
+[32m+[m[32m5ac1727f5542994ab5c67d41	24401531	1[m
+[32m+[m[32m5ac1727f5542994ab5c67d41	8259246	1[m
+[32m+[m[32m5ab458bc5542990594ba9c03	52549	1[m
+[32m+[m[32m5ab458bc5542990594ba9c03	50784	1[m
+[32m+[m[32m5ae78ccc5542997ec27276a0	25246194	1[m
+[32m+[m[32m5ae78ccc5542997ec27276a0	23964	1[m
+[32m+[m[32m5ab7cc1c55429928e1fe3905	750662	1[m
+[32m+[m[32m5ab7cc1c55429928e1fe3905	42198	1[m
+[32m+[m[32m5a7cbb3e554299683c1c6359	9892055	1[m
+[32m+[m[32m5a7cbb3e554299683c1c6359	19245641	1[m
+[32m+[m[32m5a8f8ffb5542997ba9cb32c7	11530	1[m
+[32m+[m[32m5a8f8ffb5542997ba9cb32c7	42256052	1[m
+[32m+[m[32m5a8082755542992bc0c4a73f	16152792	1[m
+[32m+[m[32m5a8082755542992bc0c4a73f	54744019	1[m
+[32m+[m[32m5ae20c995542997283cd2373	515650	1[m
+[32m+[m[32m5ae20c995542997283cd2373	5907	1[m
+[32m+[m[32m5a8519c45542994c784ddafa	44142758	1[m
+[32m+[m[32m5a8519c45542994c784ddafa	232009	1[m
+[32m+[m[32m5a8787f95542996e4f30882f	22541230	1[m
+[32m+[m[32m5a8787f95542996e4f30882f	529208	1[m
+[32m+[m[32m5ab69f4755429954757d3338	8382465	1[m
+[32m+[m[32m5ab69f4755429954757d3338	8366398	1[m
+[32m+[m[32m5a8713ac55429960ec39b729	40728822	1[m
+[32m+[m[32m5a8713ac55429960ec39b729	36122724	1[m
+[32m+[m[32m5a9056a45542995b442420a5	20818882	1[m
+[32m+[m[32m5a9056a45542995b442420a5	1181584	1[m
+[32m+[m[32m5a8cae385542996e8ac88b1d	2367486	1[m
+[32m+[m[32m5a8cae385542996e8ac88b1d	51905	1[m
+[32m+[m[32m5ae3546a5542992e3233c380	11777679	1[m
+[32m+[m[32m5ae3546a5542992e3233c380	4339066	1[m
+[32m+[m[32m5ab6c1ec554299110f219a61	599513	1[m
+[32m+[m[32m5ab6c1ec554299110f219a61	174846	1[m
+[32m+[m[32m5a8506aa5542997175ce1f76	1966544	1[m
+[32m+[m[32m5a8506aa5542997175ce1f76	6209596	1[m
+[32m+[m[32m5ab7034c5542991d32223749	11769514	1[m
+[32m+[m[32m5ab7034c5542991d32223749	6576	1[m
+[32m+[m[32m5a7b76cd5542997c3ec971a0	9808002	1[m
+[32m+[m[32m5a7b76cd5542997c3ec971a0	327771	1[m
+[32m+[m[32m5a713a025542994082a3e6a3	35747065	1[m
+[32m+[m[32m5a713a025542994082a3e6a3	1427451	1[m
+[32m+[m[32m5ac022615542997d642959c2	28882741	1[m
+[32m+[m[32m5ac022615542997d642959c2	465434	1[m
+[32m+[m[32m5a898c7255429938390d4048	10981840	1[m
+[32m+[m[32m5a898c7255429938390d4048	428681	1[m
+[32m+[m[32m5ae48e1b5542995ad6573d7f	4521898	1[m
+[32m+[m[32m5ae48e1b5542995ad6573d7f	2116	1[m
+[32m+[m[32m5abfd72f5542997ec76fd459	23967563	1[m
+[32m+[m[32m5abfd72f5542997ec76fd459	7645527	1[m
+[32m+[m[32m5ae209745542994d89d5b31e	6647071	1[m
+[32m+[m[32m5ae209745542994d89d5b31e	22569910	1[m
+[32m+[m[32m5add46a15542995b365faaf0	10773705	1[m
+[32m+[m[32m5add46a15542995b365faaf0	1315337	1[m
+[32m+[m[32m5a7e17ac5542995ed0d1668d	33327429	1[m
+[32m+[m[32m5a7e17ac5542995ed0d1668d	150210	1[m
+[32m+[m[32m5a7e1c2b55429965cec5ea73	38385334	1[m
+[32m+[m[32m5a7e1c2b55429965cec5ea73	43257085	1[m
+[32m+[m[32m5ac3e8445542997ea680c991	643635	1[m
+[32m+[m[32m5ac3e8445542997ea680c991	16978654	1[m
+[32m+[m[32m5ab496e755429942dd415f72	23241643	1[m
+[32m+[m[32m5ab496e755429942dd415f72	5064824	1[m
+[32m+[m[32m5abd81cc55429924427fd02c	48517595	1[m
+[32m+[m[32m5abd81cc55429924427fd02c	41475901	1[m
+[32m+[m[32m5ab9b61e554299743d22ebbd	881405	1[m
+[32m+[m[32m5ab9b61e554299743d22ebbd	1369129	1[m
+[32m+[m[32m5ab20aa055429970612095b2	12490	1[m
+[32m+[m[32m5ab20aa055429970612095b2	16125	1[m
+[32m+[m[32m5ae237285542994d89d5b398	27644319	1[m
+[32m+[m[32m5ae237285542994d89d5b398	197225	1[m
+[32m+[m[32m5ab6691155429954757d328f	29546455	1[m
+[32m+[m[32m5ab6691155429954757d328f	416641	1[m
+[32m+[m[32m5a72762d5542997f827839e4	36127934	1[m
+[32m+[m[32m5a72762d5542997f827839e4	42526542	1[m
+[32m+[m[32m5a8a5af7554299515336137a	11140935	1[m
+[32m+[m[32m5a8a5af7554299515336137a	2116	1[m
+[32m+[m[32m5adf5e1c5542995ec70e8fd7	48250052	1[m
+[32m+[m[32m5adf5e1c5542995ec70e8fd7	32620021	1[m
+[32m+[m[32m5ae4779755429913cc204475	2017208	1[m
+[32m+[m[32m5ae4779755429913cc204475	30181592	1[m
+[32m+[m[32m5a72abac5542992359bc3161	2738964	1[m
+[32m+[m[32m5a72abac5542992359bc3161	1298286	1[m
+[32m+[m[32m5abecf3e5542997ec76fd36f	22974435	1[m
+[32m+[m[32m5abecf3e5542997ec76fd36f	32055761	1[m
+[32m+[m[32m5adff1db55429925eb1afb63	3729483	1[m
+[32m+[m[32m5adff1db55429925eb1afb63	155971	1[m
+[32m+[m[32m5ae744085542991bbc9761cb	23602088	1[m
+[32m+[m[32m5ae744085542991bbc9761cb	2543851	1[m
+[32m+[m[32m5ae5a7885542992663a4f206	8293089	1[m
+[32m+[m[32m5ae5a7885542992663a4f206	102096	1[m
+[32m+[m[32m5a738fe45542992d56e7e369	22814153	1[m
+[32m+[m[32m5a738fe45542992d56e7e369	13297	1[m
+[32m+[m[32m5ac264b5554299636651999e	3967347	1[m
+[32m+[m[32m5ac264b5554299636651999e	5952404	1[m
+[32m+[m[32m5adcea865542992c1e3a24b1	5344843	1[m
+[32m+[m[32m5adcea865542992c1e3a24b1	1284105	1[m
+[32m+[m[32m5abc85d2554299114383a13a	37377761	1[m
+[32m+[m[32m5abc85d2554299114383a13a	1218874	1[m
+[32m+[m[32m5ab2d138554299545a2cfaa5	19502541	1[m
+[32m+[m[32m5ab2d138554299545a2cfaa5	683150	1[m
+[32m+[m[32m5ae2be445542992decbdcd8f	3959095	1[m
+[32m+[m[32m5ae2be445542992decbdcd8f	8058063	1[m
+[32m+[m[32m5ae56bb0554299546bf82ed5	16646567	1[m
+[32m+[m[32m5ae56bb0554299546bf82ed5	963887	1[m
+[32m+[m[32m5a71289a5542994082a3e5f1	12324752	1[m
+[32m+[m[32m5a71289a5542994082a3e5f1	28097533	1[m
+[32m+[m[32m5a8056255542995d8a8ddf6a	17510555	1[m
+[32m+[m[32m5a8056255542995d8a8ddf6a	11668	1[m
+[32m+[m[32m5add6c115542992200553b10	22213969	1[m
+[32m+[m[32m5add6c115542992200553b10	10567534	1[m
+[32m+[m[32m5abd929f55429933744ab7fe	1045532	1[m
+[32m+[m[32m5abd929f55429933744ab7fe	166234	1[m
+[32m+[m[32m5abb326055429939ce03dda3	38340152	1[m
+[32m+[m[32m5abb326055429939ce03dda3	2793219	1[m
+[32m+[m[32m5ae40d425542996836b02c29	20805584	1[m
+[32m+[m[32m5ae40d425542996836b02c29	674500	1[m
+[32m+[m[32m5a80a3205542992bc0c4a792	33308563	1[m
+[32m+[m[32m5a80a3205542992bc0c4a792	30799710	1[m
+[32m+[m[32m5a8bc40c5542997f31a41dbe	77549	1[m
+[32m+[m[32m5a8bc40c5542997f31a41dbe	315411	1[m
+[32m+[m[32m5ab31026554299753aec592e	33503944	1[m
+[32m+[m[32m5ab31026554299753aec592e	431380	1[m
+[32m+[m[32m5a7e48c5554299495941997e	5373167	1[m
+[32m+[m[32m5a7e48c5554299495941997e	437319	1[m
+[32m+[m[32m5a7f68b65542994857a7672f	50217863	1[m
+[32m+[m[32m5a7f68b65542994857a7672f	9870715	1[m
+[32m+[m[32m5ae722e65542992ae0d163b2	13974975	1[m
+[32m+[m[32m5ae722e65542992ae0d163b2	146788	1[m
+[32m+[m[32m5a7ed5625542994959419a83	12728106	1[m
+[32m+[m[32m5a7ed5625542994959419a83	9068605	1[m
+[32m+[m[32m5a7de1d05542995f4f4022f1	35277687	1[m
+[32m+[m[32m5a7de1d05542995f4f4022f1	26823325	1[m
+[32m+[m[32m5ac28ab35542992f1f2b38f3	54868136	1[m
+[32m+[m[32m5ac28ab35542992f1f2b38f3	287679	1[m
+[32m+[m[32m5a8325d95542990548d0b191	26065974	1[m
+[32m+[m[32m5a8325d95542990548d0b191	42144705	1[m
+[32m+[m[32m5abd131255429933744ab706	8336705	1[m
+[32m+[m[32m5abd131255429933744ab706	1105972	1[m
+[32m+[m[32m5ac00b915542997d642959ae	965330	1[m
+[32m+[m[32m5ac00b915542997d642959ae	1140687	1[m
+[32m+[m[32m5ae74bf15542997b22f6a692	11076159	1[m
+[32m+[m[32m5ae74bf15542997b22f6a692	22753	1[m
+[32m+[m[32m5ae238515542992decbdcc7c	8597528	1[m
+[32m+[m[32m5ae238515542992decbdcc7c	40136659	1[m
+[32m+[m[32m5ab94ffa5542996be2020476	23636690	1[m
+[32m+[m[32m5ab94ffa5542996be2020476	66299	1[m
+[32m+[m[32m5ae1815555429901ffe4aed2	4076935	1[m
+[32m+[m[32m5ae1815555429901ffe4aed2	847488	1[m
+[32m+[m[32m5adc4f165542996e685252f8	552200	1[m
+[32m+[m[32m5adc4f165542996e685252f8	6963454	1[m
+[32m+[m[32m5ac029d05542992a796decb5	1568486	1[m
+[32m+[m[32m5ac029d05542992a796decb5	345575	1[m
+[32m+[m[32m5ade87b35542997c77adee46	4922933	1[m
+[32m+[m[32m5ade87b35542997c77adee46	596825	1[m
+[32m+[m[32m5abe88cd55429976d4830b5a	46199738	1[m
+[32m+[m[32m5abe88cd55429976d4830b5a	40180389	1[m
+[32m+[m[32m5aba4f3b55429939ce03dc8c	203311	1[m
+[32m+[m[32m5aba4f3b55429939ce03dc8c	10465462	1[m
+[32m+[m[32m5a820c3c55429926c1cdae06	17671538	1[m
+[32m+[m[32m5a820c3c55429926c1cdae06	10856375	1[m
+[32m+[m[32m5a75ea29554299109176e5cf	1284592	1[m
+[32m+[m[32m5a75ea29554299109176e5cf	147343	1[m
+[32m+[m[32m5a83a3ee554299123d8c217c	22852849	1[m
+[32m+[m[32m5a83a3ee55429912
