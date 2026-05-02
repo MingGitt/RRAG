@@ -1,0 +1,5 @@
+{
+  "faithfulness": 0.6506067416143948,
+  "llm_context_precision_without_reference": 0.593422567604889,
+  "context_recall": 0.6683673469387755
+}

@@ -530,9 +530,9 @@ export default function LocalDocRagFrontend() {
       <div className="page-inner">
         <header className="hero">
           <div>
-            <h1>RRAG 文档智能问答系统</h1>
+            <h1>文档智能问答系统</h1>
             <p>
-              基于当前已上传文档进行检索、重排、风险评估与 Self-RAG 生成。
+              便捷的文档智能检索服务
             </p>
           </div>
           <div className="hero-stats">
@@ -682,7 +682,7 @@ export default function LocalDocRagFrontend() {
               <div className="panel-head">
                 <h2>问答页面</h2>
                 <span className="panel-sub">
-                  保留原检索流程，只在生成阶段使用 Self-RAG
+                  请在上传文档后向小助手提问吧！
                 </span>
               </div>
 

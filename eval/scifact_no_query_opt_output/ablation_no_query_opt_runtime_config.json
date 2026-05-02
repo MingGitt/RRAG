@@ -1,0 +1,37 @@
+{
+  "project_root": "D:\\code\\rag\\FSR",
+  "backend_dir": "D:\\code\\rag\\FSR\\backend",
+  "eval_dir": "D:\\code\\rag\\FSR\\eval",
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_store",
+  "dataset": "scifact",
+  "dataset_path_from_config": "D:\\code\\rag\\FSR\\data\\scifact",
+  "embed_model_name": "BAAI/bge-base-en-v1.5",
+  "chunk_size": 400,
+  "chunk_overlap": 80,
+  "alpha": 0.7,
+  "top_k_chunks": 50,
+  "dense_candidate_k": 200,
+  "bm25_candidate_k": 100,
+  "doc_agg_mode": "max",
+  "query_workers": 4,
+  "rerank_top_docs": 50,
+  "generation_top_n": 50,
+  "generation_max_per_doc": 3,
+  "max_samples": 100,
+  "max_concurrency": 4,
+  "ablation": {
+    "name": "no_query_optimization",
+    "removed": [
+      "QueryOptimizer.expand",
+      "query_type_classification",
+      "query_rewrite_or_expansion",
+      "subquery_decomposition"
+    ],
+    "kept": [
+      "HybridRetriever",
+      "Reranker",
+      "ChunkCritiqueJudge",
+      "Generator"
+    ]
+  }
+}

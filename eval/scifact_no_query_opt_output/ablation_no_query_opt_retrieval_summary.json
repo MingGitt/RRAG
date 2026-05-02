@@ -1,0 +1,120 @@
+{
+  "task": "scifact_ablation_no_query_optimization",
+  "description": "取消查询优化模块，每个 query 直接进入检索；其余混合检索、重排序、generation chunk 筛选、生成流程保持不变。",
+  "dataset": "scifact",
+  "dataset_path": "D:\\code\\rag\\FSR\\data\\scifact",
+  "corpus_size": 5183,
+  "query_size_total": 300,
+  "query_size_eval": 300,
+  "retrieved_queries": 300,
+  "generation_chunk_queries": 300,
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_store",
+  "embed_model": "BAAI/bge-base-en-v1.5",
+  "chunk_size": 400,
+  "chunk_overlap": 80,
+  "alpha": 0.7,
+  "top_k_chunks": 50,
+  "dense_candidate_k": 200,
+  "bm25_candidate_k": 100,
+  "query_workers": 4,
+  "rerank_top_docs": 50,
+  "generation_top_n": 50,
+  "generation_max_per_doc": 3,
+  "retrieval_elapsed_sec": 1541.02,
+  "avg_retrieval_elapsed_per_query_sec": 5.136735,
+  "removed_modules": [
+    "QueryOptimizer.expand",
+    "query_type_classification",
+    "query_rewrite_or_expansion",
+    "subquery_decomposition"
+  ],
+  "kept_modules": [
+    "HybridRetriever.retrieve",
+    "Reranker.rerank_texts",
+    "RetrievalEvaluator.aggregate_doc_scores",
+    "ChunkCritiqueJudge.judge_chunks",
+    "ChunkCritiqueJudge.select_generation_chunks",
+    "Reranker.select_generation_chunks_fallback"
+  ],
+  "query_type_stats": {
+    "no_query_optimization": 300
+  },
+  "generation_doc_agg_mode": "max",
+  "generation_score_key": "critique_score",
+  "metrics_rerank_docs": {
+    "NDCG": {
+      "NDCG@1": 0.58,
+      "NDCG@3": 0.64372,
+      "NDCG@5": 0.67297,
+      "NDCG@10": 0.70386,
+      "NDCG@20": 0.72071,
+      "NDCG@50": 0.72654,
+      "NDCG@100": 0.72654
+    },
+    "MAP": {
+      "MAP@1": 0.55356,
+      "MAP@3": 0.61558,
+      "MAP@5": 0.63521,
+      "MAP@10": 0.64965,
+      "MAP@20": 0.65496,
+      "MAP@50": 0.65621,
+      "MAP@100": 0.65621
+    },
+    "Recall": {
+      "Recall@1": 0.55356,
+      "Recall@3": 0.69294,
+      "Recall@5": 0.76406,
+      "Recall@10": 0.85678,
+      "Recall@20": 0.91922,
+      "Recall@50": 0.946,
+      "Recall@100": 0.946
+    },
+    "Precision": {
+      "P@1": 0.58,
+      "P@3": 0.24889,
+      "P@5": 0.16867,
+      "P@10": 0.096,
+      "P@20": 0.05183,
+      "P@50": 0.0214,
+      "P@100": 0.0107
+    }
+  },
+  "metrics_generation_chunks_aggregated_to_docs": {
+    "NDCG": {
+      "NDCG@1": 0.53,
+      "NDCG@3": 0.60919,
+      "NDCG@5": 0.63341,
+      "NDCG@10": 0.64486,
+      "NDCG@20": 0.64803,
+      "NDCG@50": 0.64803,
+      "NDCG@100": 0.64803
+    },
+    "MAP": {
+      "MAP@1": 0.49883,
+      "MAP@3": 0.5805,
+      "MAP@5": 0.59782,
+      "MAP@10": 0.60324,
+      "MAP@20": 0.60442,
+      "MAP@50": 0.60442,
+      "MAP@100": 0.60442
+    },
+    "Recall": {
+      "Recall@1": 0.49883,
+      "Recall@3": 0.66661,
+      "Recall@5": 0.7245,
+      "Recall@10": 0.75556,
+      "Recall@20": 0.76622,
+      "Recall@50": 0.76622,
+      "Recall@100": 0.76622
+    },
+    "Precision": {
+      "P@1": 0.53,
+      "P@3": 0.24111,
+      "P@5": 0.16133,
+      "P@10": 0.08567,
+      "P@20": 0.04367,
+      "P@50": 0.01747,
+      "P@100": 0.00873
+    }
+  }
+}

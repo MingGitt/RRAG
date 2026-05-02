@@ -1,0 +1,32 @@
+{
+  "task": "kilt_nq_200_single_index_ablation_query_type_only",
+  "ablation": "query_type_only_no_retrieve_decision",
+  "description": "取消是否检索判断，不再输出 YES/NO，所有问题都进入检索；只保留 simple/fuzzy/complex 查询类型判断，并统计平均端到端响应时间。",
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_kilt_nq_200_single",
+  "collection_name": "kilt_nq_200_single",
+  "questions_path": "D:\\code\\rag\\FSR\\data\\kilt_nq_200_fulltext\\kilt_nq_200_questions.jsonl",
+  "total": 200,
+  "errors": 0,
+  "valid_total": 200,
+  "answer_em": 0.015,
+  "answer_f1": 0.15720708362652003,
+  "provenance_recall": {
+    "R@1": 0.925,
+    "R@3": 0.945,
+    "R@5": 0.955,
+    "R@10": 0.97
+  },
+  "avg_latency_sec": 50.67128603577614,
+  "query_type_stats": {
+    "fuzzy": 36,
+    "simple": 149,
+    "complex": 15
+  },
+  "avg_expanded_query_count": 1.725,
+  "ragas_top_k": 5,
+  "max_context_chars": 4000,
+  "details_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_query_type_only_outputs\\kilt_nq_query_type_only_eval_details.jsonl",
+  "summary_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_query_type_only_outputs\\kilt_nq_query_type_only_eval_summary.json",
+  "ragas_legacy_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_query_type_only_outputs\\kilt_nq_query_type_only_ragas_legacy.jsonl",
+  "ragas_new_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_query_type_only_outputs\\kilt_nq_query_type_only_ragas_new.jsonl"
+}

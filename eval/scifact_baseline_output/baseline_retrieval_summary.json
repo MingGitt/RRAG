@@ -1,0 +1,102 @@
+{
+  "task": "scifact_baseline_retrieval",
+  "dataset": "scifact",
+  "dataset_path": "D:\\code\\rag\\FSR\\data\\scifact",
+  "corpus_size": 5183,
+  "query_size_total": 300,
+  "query_size_eval": 300,
+  "retrieved_queries": 300,
+  "generation_chunk_queries": 300,
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_store",
+  "embed_model": "BAAI/bge-base-en-v1.5",
+  "chunk_size": 400,
+  "chunk_overlap": 80,
+  "alpha": 0.7,
+  "query_workers": 4,
+  "subquery_workers": 8,
+  "rerank_top_docs": 50,
+  "retrieval_elapsed_sec": 1367.958,
+  "avg_retrieval_elapsed_per_query_sec": 4.559859,
+  "query_type_stats": {
+    "simple": 289,
+    "fuzzy": 11
+  },
+  "generation_doc_agg_mode": "max",
+  "generation_score_key": "critique_score",
+  "metrics_rerank_docs": {
+    "NDCG": {
+      "NDCG@1": 0.58,
+      "NDCG@3": 0.64538,
+      "NDCG@5": 0.67335,
+      "NDCG@10": 0.70305,
+      "NDCG@20": 0.72079,
+      "NDCG@50": 0.72662,
+      "NDCG@100": 0.72662
+    },
+    "MAP": {
+      "MAP@1": 0.55356,
+      "MAP@3": 0.61669,
+      "MAP@5": 0.63565,
+      "MAP@10": 0.64954,
+      "MAP@20": 0.65513,
+      "MAP@50": 0.65637,
+      "MAP@100": 0.65637
+    },
+    "Recall": {
+      "Recall@1": 0.55356,
+      "Recall@3": 0.69628,
+      "Recall@5": 0.76406,
+      "Recall@10": 0.85344,
+      "Recall@20": 0.91922,
+      "Recall@50": 0.946,
+      "Recall@100": 0.946
+    },
+    "Precision": {
+      "P@1": 0.58,
+      "P@3": 0.25,
+      "P@5": 0.16867,
+      "P@10": 0.09567,
+      "P@20": 0.05183,
+      "P@50": 0.0214,
+      "P@100": 0.0107
+    }
+  },
+  "metrics_generation_chunks_aggregated_to_docs": {
+    "NDCG": {
+      "NDCG@1": 0.52333,
+      "NDCG@3": 0.60721,
+      "NDCG@5": 0.6259,
+      "NDCG@10": 0.64235,
+      "NDCG@20": 0.64374,
+      "NDCG@50": 0.64374,
+      "NDCG@100": 0.64374
+    },
+    "MAP": {
+      "MAP@1": 0.49383,
+      "MAP@3": 0.57578,
+      "MAP@5": 0.59,
+      "MAP@10": 0.59821,
+      "MAP@20": 0.59857,
+      "MAP@50": 0.59857,
+      "MAP@100": 0.59857
+    },
+    "Recall": {
+      "Recall@1": 0.49383,
+      "Recall@3": 0.67328,
+      "Recall@5": 0.71883,
+      "Recall@10": 0.76333,
+      "Recall@20": 0.76833,
+      "Recall@50": 0.76833,
+      "Recall@100": 0.76833
+    },
+    "Precision": {
+      "P@1": 0.52333,
+      "P@3": 0.24333,
+      "P@5": 0.15933,
+      "P@10": 0.087,
+      "P@20": 0.04383,
+      "P@50": 0.01753,
+      "P@100": 0.00877
+    }
+  }
+}

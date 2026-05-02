@@ -1,0 +1,17 @@
+{
+  "project_root": "D:\\code\\rag\\FSR",
+  "backend_dir": "D:\\code\\rag\\FSR\\backend",
+  "eval_dir": "D:\\code\\rag\\FSR\\eval",
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_store",
+  "dataset": "scifact",
+  "dataset_path_from_config": "D:\\code\\rag\\FSR\\data\\scifact",
+  "embed_model_name": "BAAI/bge-base-en-v1.5",
+  "chunk_size": 400,
+  "chunk_overlap": 80,
+  "alpha": 0.7,
+  "query_workers": 4,
+  "subquery_workers": 8,
+  "rerank_top_docs": 50,
+  "max_samples": 100,
+  "max_concurrency": 4
+}

@@ -1,0 +1,122 @@
+{
+  "dataset": "hotpotqa_distractor",
+  "setting": "ablation_no_query_optimization",
+  "ablation": {
+    "query_optimization": false,
+    "query_rewrite": false,
+    "query_routing": false,
+    "retrieval_query": "original_question",
+    "kept_modules": [
+      "global_deduplicated_collection",
+      "hybrid_retrieval",
+      "rerank",
+      "generation_chunk_selection",
+      "generator"
+    ]
+  },
+  "data_dir": "D:\\code\\rag\\FSR\\data\\hotpotqa_distractor",
+  "chroma_root": "D:\\code\\rag\\FSR\\chroma_store",
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_store\\hotpotqa_no_query_opt_1000",
+  "collection_name": "hotpotqa_distractor_no_query_opt",
+  "output_dir": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\hotpotqa_no_query_opt_output_20260428_141735",
+  "split": "validation",
+  "max_samples_for_collection": 1000,
+  "max_queries": 200,
+  "evaluated_queries": 200,
+  "unique_paragraphs": 9769,
+  "chunks": 26276,
+  "chunk_size": 400,
+  "chunk_overlap": 80,
+  "retrieval_params": {
+    "top_k_chunks": 50,
+    "dense_k": 200,
+    "bm25_k": 100,
+    "alpha": 0.7,
+    "with_rerank": true,
+    "rerank_top_k": 50
+  },
+  "generation_params": {
+    "with_generation": true,
+    "generation_top_n": 5,
+    "generation_max_per_doc": 3
+  },
+  "retrieval": {
+    "hit@1": 0.885,
+    "hit@2": 0.95,
+    "hit@3": 0.98,
+    "hit@5": 0.99,
+    "hit@10": 0.995,
+    "hit@20": 1.0,
+    "hit@50": 1.0,
+    "recall@1": 0.4425,
+    "recall@2": 0.6925,
+    "recall@3": 0.765,
+    "recall@5": 0.83,
+    "recall@10": 0.9175,
+    "recall@20": 0.9625,
+    "recall@50": 0.985,
+    "mrr": 0.9303680555555556
+  },
+  "generation_chunk_selection": {
+    "hit@1": 0.885,
+    "hit@2": 0.95,
+    "hit@3": 0.98,
+    "hit@5": 0.99,
+    "hit@10": 0.99,
+    "hit@20": 0.99,
+    "hit@50": 0.99,
+    "recall@1": 0.4425,
+    "recall@2": 0.6925,
+    "recall@3": 0.765,
+    "recall@5": 0.8125,
+    "recall@10": 0.8125,
+    "recall@20": 0.8125,
+    "recall@50": 0.8125,
+    "mrr": 0.9295
+  },
+  "answer": {
+    "answer_em": 0.17,
+    "answer_f1": 0.3066598726038665
+  },
+  "by_type": {
+    "recall@2": {
+      "comparison": 0.8529411764705882,
+      "bridge": 0.6596385542168675
+    },
+    "recall@5": {
+      "comparison": 0.9852941176470589,
+      "bridge": 0.7981927710843374
+    },
+    "recall@10": {
+      "comparison": 1.0,
+      "bridge": 0.9006024096385542
+    }
+  },
+  "by_level": {
+    "recall@2": {
+      "hard": 0.6925
+    },
+    "recall@5": {
+      "hard": 0.83
+    },
+    "recall@10": {
+      "hard": 0.9175
+    }
+  },
+  "timing": {
+    "vector_build_or_load_time": 917.2801055908203,
+    "total_retrieval_time": 35.7124969959259,
+    "total_rerank_time": 69.04068350791931,
+    "total_generation_time": 2973.5243446826935,
+    "avg_retrieval_time": 0.1785624849796295,
+    "avg_rerank_time": 0.34520341753959655,
+    "avg_generation_time": 14.867621723413468
+  },
+  "files": {
+    "summary": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\hotpotqa_no_query_opt_output_20260428_141735\\summary.json",
+    "details": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\hotpotqa_no_query_opt_output_20260428_141735\\details.jsonl",
+    "doc_map": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\hotpotqa_no_query_opt_output_20260428_141735\\doc_map.json",
+    "qrels": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\hotpotqa_no_query_opt_output_20260428_141735\\qrels.json",
+    "sample_meta": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\hotpotqa_no_query_opt_output_20260428_141735\\sample_meta.json"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "task": "kilt_nq_200_single_index_ablation_only_vector_no_hybrid_no_rerank",
+  "ablation": "only_vector_no_hybrid_no_rerank",
+  "description": "严格基线消融：只把混合检索和 CrossEncoder 重排序替换为纯向量检索与顺序透传 reranker；保留 NO/simple/fuzzy/complex 判断、查询改写/分解、generation chunk 筛选、生成和融合。",
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_kilt_nq_200_single",
+  "collection_name": "kilt_nq_200_single",
+  "questions_path": "D:\\code\\rag\\FSR\\data\\kilt_nq_200_fulltext\\kilt_nq_200_questions.jsonl",
+  "total": 200,
+  "errors": 0,
+  "valid_total": 200,
+  "answer_em": 0.025,
+  "answer_f1": 0.17915496508356032,
+  "provenance_recall": {
+    "R@1": 0.88,
+    "R@3": 0.92,
+    "R@5": 0.92,
+    "R@10": 0.925
+  },
+  "avg_latency_sec": 38.0788038957119,
+  "query_type_stats": {
+    "simple": 171,
+    "fuzzy": 20,
+    "subquery_count": 96,
+    "complex": 5,
+    "no_retrieval": 4
+  },
+  "avg_generation_chunk_count": 5.755,
+  "ragas_top_k": 5,
+  "max_context_chars": 4000,
+  "details_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_vector_only_outputs\\kilt_nq_only_vector_no_hybrid_no_rerank_eval_details.jsonl",
+  "summary_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_vector_only_outputs\\kilt_nq_only_vector_no_hybrid_no_rerank_eval_summary.json",
+  "ragas_legacy_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_vector_only_outputs\\kilt_nq_only_vector_no_hybrid_no_rerank_ragas_legacy.jsonl",
+  "ragas_new_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_vector_only_outputs\\kilt_nq_only_vector_no_hybrid_no_rerank_ragas_new.jsonl"
+}

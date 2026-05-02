@@ -1,0 +1,116 @@
+{
+  "task": "scifact_ablation_vector_only_direct_to_generator",
+  "description": "取消查询优化、混合检索、重排序、证据筛选；每个 query 直接做向量检索，并将向量检索 top-k chunks 直接给生成器。",
+  "dataset": "scifact",
+  "dataset_path": "D:\\code\\rag\\FSR\\data\\scifact",
+  "corpus_size": 5183,
+  "query_size_total": 300,
+  "query_size_eval": 300,
+  "retrieved_queries": 300,
+  "generation_chunk_queries": 300,
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_store",
+  "embed_model": "BAAI/bge-base-en-v1.5",
+  "chunk_size": 400,
+  "chunk_overlap": 80,
+  "vector_top_k": 50,
+  "doc_agg_mode": "max",
+  "query_workers": 4,
+  "retrieval_elapsed_sec": 24.082,
+  "avg_retrieval_elapsed_per_query_sec": 0.080275,
+  "removed_modules": [
+    "QueryOptimizer.expand",
+    "query_type_classification",
+    "query_rewrite_or_expansion",
+    "subquery_decomposition",
+    "HybridRetriever.retrieve",
+    "BM25",
+    "RRF_fusion",
+    "Reranker.rerank_texts",
+    "ChunkCritiqueJudge.judge_chunks",
+    "ChunkCritiqueJudge.select_generation_chunks"
+  ],
+  "kept_modules": [
+    "VectorStoreBuilder.build_or_load",
+    "Chroma.similarity_search_with_score",
+    "Generator.run_optional"
+  ],
+  "query_type_stats": {
+    "vector_only_no_query_optimization": 300
+  },
+  "metrics_vector_docs": {
+    "NDCG": {
+      "NDCG@1": 0.63667,
+      "NDCG@3": 0.71063,
+      "NDCG@5": 0.72991,
+      "NDCG@10": 0.74692,
+      "NDCG@20": 0.75539,
+      "NDCG@50": 0.76315,
+      "NDCG@100": 0.76315
+    },
+    "MAP": {
+      "MAP@1": 0.60594,
+      "MAP@3": 0.6812,
+      "MAP@5": 0.69595,
+      "MAP@10": 0.70472,
+      "MAP@20": 0.70771,
+      "MAP@50": 0.70916,
+      "MAP@100": 0.70916
+    },
+    "Recall": {
+      "Recall@1": 0.60594,
+      "Recall@3": 0.76378,
+      "Recall@5": 0.81317,
+      "Recall@10": 0.86189,
+      "Recall@20": 0.89267,
+      "Recall@50": 0.92933,
+      "Recall@100": 0.92933
+    },
+    "Precision": {
+      "P@1": 0.63667,
+      "P@3": 0.28,
+      "P@5": 0.182,
+      "P@10": 0.09767,
+      "P@20": 0.051,
+      "P@50": 0.02113,
+      "P@100": 0.01057
+    }
+  },
+  "metrics_generation_chunks_aggregated_to_docs": {
+    "NDCG": {
+      "NDCG@1": 0.63667,
+      "NDCG@3": 0.71063,
+      "NDCG@5": 0.72991,
+      "NDCG@10": 0.74692,
+      "NDCG@20": 0.75539,
+      "NDCG@50": 0.76315,
+      "NDCG@100": 0.76315
+    },
+    "MAP": {
+      "MAP@1": 0.60594,
+      "MAP@3": 0.6812,
+      "MAP@5": 0.69595,
+      "MAP@10": 0.70472,
+      "MAP@20": 0.70771,
+      "MAP@50": 0.70916,
+      "MAP@100": 0.70916
+    },
+    "Recall": {
+      "Recall@1": 0.60594,
+      "Recall@3": 0.76378,
+      "Recall@5": 0.81317,
+      "Recall@10": 0.86189,
+      "Recall@20": 0.89267,
+      "Recall@50": 0.92933,
+      "Recall@100": 0.92933
+    },
+    "Precision": {
+      "P@1": 0.63667,
+      "P@3": 0.28,
+      "P@5": 0.182,
+      "P@10": 0.09767,
+      "P@20": 0.051,
+      "P@50": 0.02113,
+      "P@100": 0.01057
+    }
+  }
+}

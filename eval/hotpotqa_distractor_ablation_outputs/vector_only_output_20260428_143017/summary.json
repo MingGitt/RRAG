@@ -1,0 +1,127 @@
+{
+  "dataset": "hotpotqa_distractor",
+  "setting": "ablation_vector_only_no_query_opt_no_hybrid_no_rerank",
+  "ablation": {
+    "query_optimization": false,
+    "query_rewrite": false,
+    "query_routing": false,
+    "hybrid_retrieval": false,
+    "bm25_retrieval": false,
+    "rerank": false,
+    "retrieval_query": "original_question",
+    "retrieval_method": "chroma_vector_similarity_search_with_score",
+    "generation_chunks": "vector_topk_directly_to_generator",
+    "kept_modules": [
+      "global_deduplicated_collection",
+      "vector_store",
+      "generator",
+      "answer_em_f1_eval",
+      "retrieval_recall_eval"
+    ]
+  },
+  "data_dir": "D:\\code\\rag\\FSR\\data\\hotpotqa_distractor",
+  "chroma_root": "D:\\code\\rag\\FSR\\chroma_store",
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_store\\hotpotqa_distractor_global_1000",
+  "collection_name": "hotpotqa_distractor_global",
+  "output_dir": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\vector_only_output_20260428_143017",
+  "split": "validation",
+  "max_samples_for_collection": 1000,
+  "max_queries": 200,
+  "evaluated_queries": 200,
+  "unique_paragraphs": 9769,
+  "chunks": 26276,
+  "chunk_size": 400,
+  "chunk_overlap": 80,
+  "retrieval_params": {
+    "vector_top_k": 50,
+    "with_hybrid": false,
+    "with_bm25": false,
+    "with_rerank": false
+  },
+  "generation_params": {
+    "with_generation": true,
+    "generation_top_n": 5,
+    "generation_max_per_doc": 3
+  },
+  "retrieval": {
+    "hit@1": 0.875,
+    "hit@2": 0.94,
+    "hit@3": 0.965,
+    "hit@5": 0.985,
+    "hit@10": 0.99,
+    "hit@20": 0.995,
+    "hit@50": 0.995,
+    "recall@1": 0.4375,
+    "recall@2": 0.6875,
+    "recall@3": 0.765,
+    "recall@5": 0.835,
+    "recall@10": 0.905,
+    "recall@20": 0.9475,
+    "recall@50": 0.9625,
+    "mrr": 0.9216822344322344
+  },
+  "generation_chunk_selection": {
+    "hit@1": 0.875,
+    "hit@2": 0.94,
+    "hit@3": 0.965,
+    "hit@5": 0.985,
+    "hit@10": 0.985,
+    "hit@20": 0.985,
+    "hit@50": 0.985,
+    "recall@1": 0.4375,
+    "recall@2": 0.6875,
+    "recall@3": 0.765,
+    "recall@5": 0.8225,
+    "recall@10": 0.8225,
+    "recall@20": 0.8225,
+    "recall@50": 0.8225,
+    "mrr": 0.9205833333333334
+  },
+  "answer": {
+    "answer_em": 0.2,
+    "answer_f1": 0.3275285380321048
+  },
+  "by_type": {
+    "recall@2": {
+      "comparison": 0.8823529411764706,
+      "bridge": 0.6475903614457831
+    },
+    "recall@5": {
+      "comparison": 0.9558823529411765,
+      "bridge": 0.8102409638554217
+    },
+    "recall@10": {
+      "comparison": 0.9558823529411765,
+      "bridge": 0.8945783132530121
+    }
+  },
+  "by_level": {
+    "recall@2": {
+      "hard": 0.6875
+    },
+    "recall@5": {
+      "hard": 0.835
+    },
+    "recall@10": {
+      "hard": 0.905
+    }
+  },
+  "timing": {
+    "vector_build_or_load_time": 8.976720333099365,
+    "total_vector_search_time": 11.954828023910522,
+    "total_retrieval_time": 11.954828023910522,
+    "total_rerank_time": 0.0,
+    "total_generation_time": 2962.006546497345,
+    "avg_vector_search_time": 0.059774140119552614,
+    "avg_retrieval_time": 0.059774140119552614,
+    "avg_rerank_time": 0.0,
+    "avg_generation_time": 14.810032732486725
+  },
+  "files": {
+    "summary": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\vector_only_output_20260428_143017\\summary.json",
+    "details": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\vector_only_output_20260428_143017\\details.jsonl",
+    "doc_map": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\vector_only_output_20260428_143017\\doc_map.json",
+    "qrels": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\vector_only_output_20260428_143017\\qrels.json",
+    "sample_meta": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\vector_only_output_20260428_143017\\sample_meta.json"
+  }
+}

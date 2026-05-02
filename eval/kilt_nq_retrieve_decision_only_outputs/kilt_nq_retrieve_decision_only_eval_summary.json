@@ -1,0 +1,34 @@
+{
+  "task": "kilt_nq_200_single_index_ablation_retrieve_decision_only",
+  "ablation": "retrieve_decision_only",
+  "description": "只保留 YES/NO 是否检索判断；YES 时原始 query 直接检索；NO 时直接生成；取消 simple/fuzzy/complex 查询优化、改写和分解。",
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_kilt_nq_200_single",
+  "collection_name": "kilt_nq_200_single",
+  "questions_path": "D:\\code\\rag\\FSR\\data\\kilt_nq_200_fulltext\\kilt_nq_200_questions.jsonl",
+  "total": 200,
+  "errors": 0,
+  "valid_total": 200,
+  "answer_em": 0.02,
+  "answer_f1": 0.16658300218519514,
+  "provenance_recall": {
+    "R@1": 0.87,
+    "R@3": 0.91,
+    "R@5": 0.92,
+    "R@10": 0.935
+  },
+  "avg_latency_sec": 25.5930155813694,
+  "retrieve_decision_stats": {
+    "YES": 196,
+    "NO": 4
+  },
+  "query_type_stats": {
+    "retrieve_yes": 196,
+    "retrieve_no": 4
+  },
+  "ragas_top_k": 5,
+  "max_context_chars": 4000,
+  "details_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_retrieve_decision_only_outputs\\kilt_nq_retrieve_decision_only_eval_details.jsonl",
+  "summary_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_retrieve_decision_only_outputs\\kilt_nq_retrieve_decision_only_eval_summary.json",
+  "ragas_legacy_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_retrieve_decision_only_outputs\\kilt_nq_retrieve_decision_only_ragas_legacy.jsonl",
+  "ragas_new_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_retrieve_decision_only_outputs\\kilt_nq_retrieve_decision_only_ragas_new.jsonl"
+}

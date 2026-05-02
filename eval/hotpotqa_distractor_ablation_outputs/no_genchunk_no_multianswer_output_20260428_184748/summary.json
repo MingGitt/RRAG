@@ -1,0 +1,137 @@
+{
+  "dataset": "hotpotqa_distractor",
+  "setting": "ablation_no_generation_chunk_filter_no_multi_answer_filter",
+  "ablation": {
+    "query_optimization": true,
+    "query_rewrite_or_decomposition": true,
+    "hybrid_retrieval": true,
+    "rerank": true,
+    "generation_chunk_filter": false,
+    "multi_candidate_generation": false,
+    "candidate_scoring": false,
+    "answer_support_judge": false,
+    "risk_controller": false,
+    "subquery_generation": "each_subquery_single_generation",
+    "final_answer": "llm_fusion_for_multiple_subanswers",
+    "generation_input": "rerank_topk_directly"
+  },
+  "data_dir": "D:\\code\\rag\\FSR\\data\\hotpotqa_distractor",
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_store\\hotpotqa_distractor_global_1000",
+  "collection_name": "hotpotqa_distractor_global",
+  "output_dir": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\no_genchunk_no_multianswer_output_20260428_184748",
+  "split": "validation",
+  "max_samples_for_collection": 1000,
+  "max_queries": 200,
+  "evaluated_queries": 200,
+  "unique_paragraphs": 9769,
+  "chunks": 26276,
+  "query_type_counts": {
+    "simple": 99,
+    "fuzzy": 17,
+    "complex": 84,
+    "NO": 0,
+    "unknown": 0
+  },
+  "retrieval_params": {
+    "top_k_chunks": 50,
+    "dense_k": 200,
+    "bm25_k": 100,
+    "alpha": 0.7,
+    "rerank_top_k": 50
+  },
+  "generation_params": {
+    "evidence_top_k": 5,
+    "max_chars_per_chunk": 1200,
+    "max_tokens": 256,
+    "fusion_max_tokens": 256,
+    "model": "qwen-plus"
+  },
+  "retrieval": {
+    "hit@1": 0.86,
+    "hit@2": 0.945,
+    "hit@3": 0.975,
+    "hit@5": 0.985,
+    "hit@10": 0.995,
+    "hit@20": 1.0,
+    "hit@50": 1.0,
+    "recall@1": 0.43,
+    "recall@2": 0.635,
+    "recall@3": 0.6925,
+    "recall@5": 0.7475,
+    "recall@10": 0.8275,
+    "recall@20": 0.88,
+    "recall@50": 0.9525,
+    "mrr": 0.9166547619047618
+  },
+  "generation_chunk_selection": {
+    "hit@1": 0.86,
+    "hit@2": 0.945,
+    "hit@3": 0.975,
+    "hit@5": 0.99,
+    "hit@10": 0.995,
+    "hit@20": 0.995,
+    "hit@50": 0.995,
+    "recall@1": 0.43,
+    "recall@2": 0.635,
+    "recall@3": 0.6975,
+    "recall@5": 0.775,
+    "recall@10": 0.87,
+    "recall@20": 0.875,
+    "recall@50": 0.875,
+    "mrr": 0.9165833333333333
+  },
+  "answer": {
+    "answer_em": 0.445,
+    "answer_f1": 0.5715020501915239
+  },
+  "by_type": {
+    "recall@5": {
+      "comparison": 0.8382352941176471,
+      "bridge": 0.7289156626506024
+    },
+    "answer_f1": {
+      "comparison": 0.5143837535014005,
+      "bridge": 0.58320097842926
+    }
+  },
+  "by_level": {
+    "recall@5": {
+      "hard": 0.7475
+    },
+    "answer_f1": {
+      "hard": 0.5715020501915239
+    }
+  },
+  "by_qtype": {
+    "recall@5": {
+      "simple": 0.898989898989899,
+      "complex": 0.5476190476190477,
+      "fuzzy": 0.8529411764705882
+    },
+    "answer_f1": {
+      "simple": 0.6611485222596334,
+      "complex": 0.4529369801738222,
+      "fuzzy": 0.6352941176470589
+    }
+  },
+  "timing": {
+    "vector_build_or_load_time": 2.0031092166900635,
+    "total_query_opt_time": 352.37535190582275,
+    "total_retrieval_time": 64.93931913375854,
+    "total_rerank_time": 133.43697714805603,
+    "total_generation_time": 362.4225528240204,
+    "total_fusion_time": 82.06379318237305,
+    "avg_query_opt_time": 1.7618767595291138,
+    "avg_retrieval_time": 0.3246965956687927,
+    "avg_rerank_time": 0.6671848857402801,
+    "avg_generation_time": 1.812112764120102,
+    "avg_fusion_time": 0.41031896591186523
+  },
+  "files": {
+    "summary": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\no_genchunk_no_multianswer_output_20260428_184748\\summary.json",
+    "details": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\no_genchunk_no_multianswer_output_20260428_184748\\details.jsonl",
+    "doc_map": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\no_genchunk_no_multianswer_output_20260428_184748\\doc_map.json",
+    "qrels": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\no_genchunk_no_multianswer_output_20260428_184748\\qrels.json",
+    "sample_meta": "D:\\code\\rag\\FSR\\eval\\hotpotqa_distractor_ablation_outputs\\no_genchunk_no_multianswer_output_20260428_184748\\sample_meta.json"
+  }
+}

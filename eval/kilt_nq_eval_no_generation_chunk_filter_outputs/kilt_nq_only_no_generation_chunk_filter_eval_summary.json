@@ -1,0 +1,34 @@
+{
+  "task": "kilt_nq_200_single_index_ablation_only_no_generation_chunk_filter",
+  "ablation": "only_no_generation_chunk_filter",
+  "description": "严格基线消融：只去掉 generation chunk 筛选，即绕过 ChunkCritiqueJudge.judge_chunks 和 ChunkCritiqueJudge.select_generation_chunks；保留 NO/simple/fuzzy/complex 判断、查询改写/分解、混合检索、rerank、生成和融合。",
+  "persist_dir": "D:\\code\\rag\\FSR\\chroma_kilt_nq_200_single",
+  "collection_name": "kilt_nq_200_single",
+  "questions_path": "D:\\code\\rag\\FSR\\data\\kilt_nq_200_fulltext\\kilt_nq_200_questions.jsonl",
+  "total": 200,
+  "errors": 0,
+  "valid_total": 200,
+  "answer_em": 0.02,
+  "answer_f1": 0.16967529783006213,
+  "provenance_recall": {
+    "R@1": 0.87,
+    "R@3": 0.91,
+    "R@5": 0.92,
+    "R@10": 0.935
+  },
+  "avg_latency_sec": 26.543680605888365,
+  "query_type_stats": {
+    "simple": 174,
+    "fuzzy": 18,
+    "subquery_count": 84,
+    "complex": 4,
+    "no_retrieval": 4
+  },
+  "avg_generation_chunk_count": 29.485,
+  "ragas_top_k": 5,
+  "max_context_chars": 4000,
+  "details_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_eval_no_generation_chunk_filter_outputs\\kilt_nq_only_no_generation_chunk_filter_eval_details.jsonl",
+  "summary_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_eval_no_generation_chunk_filter_outputs\\kilt_nq_only_no_generation_chunk_filter_eval_summary.json",
+  "ragas_legacy_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_eval_no_generation_chunk_filter_outputs\\kilt_nq_only_no_generation_chunk_filter_ragas_legacy.jsonl",
+  "ragas_new_path": "D:\\code\\rag\\FSR\\eval\\kilt_nq_eval_no_generation_chunk_filter_outputs\\kilt_nq_only_no_generation_chunk_filter_ragas_new.jsonl"
+}
