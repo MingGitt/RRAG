@@ -71,3 +71,5 @@ __pycache__/
 chroma_kilt_nq_200_single/
 data/
 docs/
+beir_datasets/
+eval/covidqa_test_output/
